@@ -1,0 +1,54 @@
+{
+  "format": 1,
+  "restore": {
+    "C:\\Users\\Leland\\Documents\\GitHub\\Cinnamon\\Cinnamon\\Cinnamon.csproj": {}
+  },
+  "projects": {
+    "C:\\Users\\Leland\\Documents\\GitHub\\Cinnamon\\Cinnamon\\Cinnamon.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\Leland\\Documents\\GitHub\\Cinnamon\\Cinnamon\\Cinnamon.csproj",
+        "projectName": "Cinnamon",
+        "projectPath": "C:\\Users\\Leland\\Documents\\GitHub\\Cinnamon\\Cinnamon\\Cinnamon.csproj",
+        "packagesPath": "C:\\Users\\Leland\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Leland\\Documents\\GitHub\\Cinnamon\\Cinnamon\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\Leland\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net48"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net48": {
+            "targetAlias": "net48",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net48": {
+          "targetAlias": "net48",
+          "dependencies": {
+            "Grasshopper": {
+              "include": "Compile, Build",
+              "target": "Package",
+              "version": "[6.35.21222.17001, )"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.100\\RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

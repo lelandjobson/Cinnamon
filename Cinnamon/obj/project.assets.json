@@ -1,0 +1,129 @@
+{
+  "version": 3,
+  "targets": {
+    ".NETFramework,Version=v4.8": {
+      "Grasshopper/6.35.21222.17001": {
+        "type": "package",
+        "dependencies": {
+          "RhinoCommon": "[6.35.21222.17001]"
+        },
+        "compile": {
+          "lib/net45/GH_IO.dll": {},
+          "lib/net45/Grasshopper.dll": {}
+        },
+        "runtime": {
+          "lib/net45/_._": {}
+        },
+        "build": {
+          "build/net45/Grasshopper.targets": {}
+        }
+      },
+      "RhinoCommon/6.35.21222.17001": {
+        "type": "package",
+        "compile": {
+          "lib/net45/Eto.dll": {},
+          "lib/net45/Rhino.UI.dll": {},
+          "lib/net45/RhinoCommon.dll": {}
+        },
+        "runtime": {
+          "lib/net45/_._": {}
+        },
+        "build": {
+          "build/net45/RhinoCommon.targets": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Grasshopper/6.35.21222.17001": {
+      "sha512": "nksjKSX/e1VMJ/pTNobzNMwCciohBE8IBXFYY45yPsGsrzKlockzU1QO+wrj4Hu7RQoRFL6ANrFZX12jWzdWrQ==",
+      "type": "package",
+      "path": "grasshopper/6.35.21222.17001",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "build/net45/Grasshopper.targets",
+        "grasshopper.6.35.21222.17001.nupkg.sha512",
+        "grasshopper.nuspec",
+        "grasshopper.png",
+        "lib/net45/GH_IO.XML",
+        "lib/net45/GH_IO.dll",
+        "lib/net45/Grasshopper.dll",
+        "lib/net45/Grasshopper.xml"
+      ]
+    },
+    "RhinoCommon/6.35.21222.17001": {
+      "sha512": "y9f+38ZLxAz+PZLdQyuijRbpL6r9PptXaSHeIHTk56Cb0+ziWWRna2a4K+4gRyhb0h9AjJLsUMWa4i0SgrdYhg==",
+      "type": "package",
+      "path": "rhinocommon/6.35.21222.17001",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Eto-LICENSE.txt",
+        "build/net45/RhinoCommon.targets",
+        "lib/net45/Eto.dll",
+        "lib/net45/Eto.xml",
+        "lib/net45/Rhino.UI.dll",
+        "lib/net45/RhinoCommon.XML",
+        "lib/net45/RhinoCommon.dll",
+        "rhinocommon.6.35.21222.17001.nupkg.sha512",
+        "rhinocommon.nuspec",
+        "rhinocommon.png"
+      ]
+    }
+  },
+  "projectFileDependencyGroups": {
+    ".NETFramework,Version=v4.8": [
+      "Grasshopper >= 6.35.21222.17001"
+    ]
+  },
+  "packageFolders": {
+    "C:\\Users\\Leland\\.nuget\\packages\\": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "C:\\Users\\Leland\\Documents\\GitHub\\Cinnamon\\Cinnamon\\Cinnamon.csproj",
+      "projectName": "Cinnamon",
+      "projectPath": "C:\\Users\\Leland\\Documents\\GitHub\\Cinnamon\\Cinnamon\\Cinnamon.csproj",
+      "packagesPath": "C:\\Users\\Leland\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Leland\\Documents\\GitHub\\Cinnamon\\Cinnamon\\obj\\",
+      "projectStyle": "PackageReference",
+      "configFilePaths": [
+        "C:\\Users\\Leland\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+      ],
+      "originalTargetFrameworks": [
+        "net48"
+      ],
+      "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "net48": {
+          "targetAlias": "net48",
+          "projectReferences": {}
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      }
+    },
+    "frameworks": {
+      "net48": {
+        "targetAlias": "net48",
+        "dependencies": {
+          "Grasshopper": {
+            "include": "Compile, Build",
+            "target": "Package",
+            "version": "[6.35.21222.17001, )"
+          }
+        },
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.100\\RuntimeIdentifierGraph.json"
+      }
+    }
+  }
+}
