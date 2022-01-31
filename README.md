@@ -1,0 +1,2 @@
+# Cinnamon
+Cinnamon gh component
