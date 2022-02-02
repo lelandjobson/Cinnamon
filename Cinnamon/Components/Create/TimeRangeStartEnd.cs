@@ -19,7 +19,7 @@ namespace Cinnamon.Components.Create
         public TimeRangeStartEnd()
           : base("TimeRange Start-End", "TimeRangeSE",
             "Creates a TimeRange given a start and end time in seconds",
-            "Cinnamon", "1_Create")
+            "Cinnamon", "1_Effects")
         {
         }
 
@@ -63,7 +63,7 @@ namespace Cinnamon.Components.Create
         /// You can add image files to your project resources and access them like this:
         /// return Resources.IconForThisComponent;
         /// </summary>
-        protected override System.Drawing.Bitmap Icon => null;
+        protected override System.Drawing.Bitmap Icon => Properties.Resources.time;
 
         /// <summary>
         /// Each component must have a unique Guid to identify it. 

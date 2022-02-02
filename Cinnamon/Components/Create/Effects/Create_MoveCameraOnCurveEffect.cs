@@ -20,7 +20,7 @@ namespace Cinnamon.Components.Create
         public Create_MoveCameraOnCurveEffect()
           : base("MoveCameraOnCurve", "MoveCameraOnCurve",
             "Moves the camera along a curve",
-            "Cinnamon", "1_Create")
+            "Cinnamon", "1_Effects")
         {
         }
 
@@ -61,7 +61,7 @@ namespace Cinnamon.Components.Create
         /// You can add image files to your project resources and access them like this:
         /// return Resources.IconForThisComponent;
         /// </summary>
-        protected override System.Drawing.Bitmap Icon => null;
+        protected override System.Drawing.Bitmap Icon => Properties.Resources.eff_03;
 
         /// <summary>
         /// Each component must have a unique Guid to identify it. 

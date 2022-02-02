@@ -20,7 +20,7 @@ namespace Cinnamon.Components.Create
         public Create_ChangeLensLengthEffect()
           : base("ChangeLensLength", "ChangeLensLength",
             "Changes the lens length of the camera over time",
-            "Cinnamon", "1_Create")
+            "Cinnamon", "1_Effects")
         {
         }
 
@@ -65,7 +65,7 @@ namespace Cinnamon.Components.Create
         /// You can add image files to your project resources and access them like this:
         /// return Resources.IconForThisComponent;
         /// </summary>
-        protected override System.Drawing.Bitmap Icon => null;
+        protected override System.Drawing.Bitmap Icon => Properties.Resources.eff_02;
 
         /// <summary>
         /// Each component must have a unique Guid to identify it. 

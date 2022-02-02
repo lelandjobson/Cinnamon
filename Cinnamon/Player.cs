@@ -55,12 +55,18 @@ namespace Cinnamon
 
         public void RenderCameraState(CameraState state)
         {
-            RhinoAppMappings.ActiveViewport.SetCameraLocation(state.PositionState, true);
-            RhinoAppMappings.ActiveViewport.SetCameraTarget(state.PositionState, true);
+            RhinoAppMappings.ActiveViewport.SetCameraLocation(state.PositionState, false);
+            RhinoAppMappings.ActiveViewport.SetCameraTarget(state.PositionState, false);
             RhinoAppMappings.ActiveViewport.Camera35mmLensLength = state.FocalLengthState;
         }
 
-        void RenderState(FrameState curState, FrameState prevState)
+        /// <summary>
+        /// Renders the frame state.
+        /// Beware of running this outside of the context of a movie!!
+        /// </summary>
+        /// <param name="curState">The state that you want to render</param>
+        /// <param name="prevState">Previous state is required for tween animations</param>
+        public void RenderState(FrameState curState, FrameState prevState)
         {
             // Camera
             if (curState.HasCameraPositionData)
@@ -76,8 +82,20 @@ namespace Cinnamon
                 RhinoAppMappings.ActiveViewport.Camera35mmLensLength = curState.CameraState.FocalLengthState;
             }
 
+            if (curState.HasLayerStates)
+            {
+                foreach(var ls in curState.LayerStates)
+                {
+                    if (ls.Value.HasTransparencyState)
+                    {
+                        ls.Key.SetTransparency(ls.Value.TransparencyState);
+                    }
+                    ls.Key.IsVisible = ls.Value.IsVisible;
+                }
+            }
+
             // Animating Objects
-            if (curState.HasObjectsAnimating)
+            if (curState.HasObjectsAnimating && prevState != null)
             {
                 foreach(var objectInMotion in curState.ObjectPositionStates.Keys)
                 {
@@ -94,6 +112,7 @@ namespace Cinnamon
 
             _previousState = curState;
         }
+
 
         #region Static members
 

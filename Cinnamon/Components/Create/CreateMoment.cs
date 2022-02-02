@@ -20,7 +20,7 @@ namespace Cinnamon.Components.Create
         public CreateMoment()
           : base("CreateMoment", "CreateMoment",
             "Creates a moment from effects",
-            "Cinnamon", "1_Create")
+            "Cinnamon", "1_Effects")
         {
         }
 
@@ -73,7 +73,7 @@ namespace Cinnamon.Components.Create
         /// You can add image files to your project resources and access them like this:
         /// return Resources.IconForThisComponent;
         /// </summary>
-        protected override System.Drawing.Bitmap Icon => null;
+        protected override System.Drawing.Bitmap Icon => Properties.Resources.moment;
 
         /// <summary>
         /// Each component must have a unique Guid to identify it. 

@@ -40,7 +40,11 @@ namespace Cinnamon.Components.CameraTools
                     if(parent == null)
                     {
                         // create parent layer
-                        var p = new Layer() { Name = CAMERA_ORDERSPARENTNAME };
+                        var p = new Layer() { 
+                            Name = CAMERA_ORDERSPARENTNAME, 
+                            IsVisible = false, 
+                            IsLocked = true 
+                        };
                         _rhlyrs.Add(p);
                         __orderLayersParent = p;
                     }
@@ -116,7 +120,11 @@ namespace Cinnamon.Components.CameraTools
             else
             {
                 // Create order layers
-                l = new Layer() { Name = order.ToString() };
+                l = new Layer() {
+                    Name = order.ToString(),
+                    IsVisible = false,
+                    IsLocked = true
+                };
                 lyrIndex = Rhino.RhinoDoc.ActiveDoc.Layers.Add(l);
                 l.ParentLayerId = _orderLayersParent.Id;
                 RegenOrderData();

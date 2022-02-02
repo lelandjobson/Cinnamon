@@ -1,21 +1,11 @@
-﻿using Rhino.Geometry;
+﻿using Rhino.DocObjects;
+using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Cinnamon.Models
 {
-    public class CameraState
-    {
-
-        public Point3d PositionState = Point3d.Unset;
-
-        public Point3d TargetPositionState = Point3d.Unset;
-
-        public double FocalLengthState = -1;
-
-
-    }
 
     [Serializable]
     public class FrameState
@@ -46,6 +36,18 @@ namespace Cinnamon.Models
         }
         private Dictionary<Guid, Point3d> _objectPositionStates;
 
+        public bool HasLayerStates = false;
+
+        public Dictionary<Layer, LayerState> LayerStates
+        {
+            get
+            {
+                if(_layerStates == null) { _layerStates = new Dictionary<Layer,LayerState>(); }
+                HasLayerStates = true;
+                return _layerStates;
+            }
+        }
+        private Dictionary<Layer, LayerState> _layerStates;
 
         public static FrameState GenerateFromDocument(Movie m, int frame)
         {
@@ -79,18 +81,26 @@ namespace Cinnamon.Models
         {
             if (resetDocObjects && _baseState != null)
             {
-
+                // TODO
+                // Render old state? IDK
             }
-            _baseState = _NewBaseState();
+            _baseState = CurrentDocumentState;
         }
 
-        static FrameState _NewBaseState()
-        {
-            var baseState = new FrameState(null, 0)
+        /// <summary>
+        /// State of the current document.
+        /// </summary>
+        public static FrameState CurrentDocumentState =>
+            new FrameState(null, 0)
             {
+                _layerStates = RhinoAppMappings.DocumentLayers.ToDictionary(
+                    l => l,
+                    l => new LayerState { IsVisible = l.IsVisible, TransparencyState = l.GetTransparency() }
+                    ),
+
                 _objectPositionStates = Rhino.RhinoDoc.ActiveDoc.Objects
-                .GetObjectList(Rhino.DocObjects.ObjectType.AnyObject)
-                .ToDictionary(o => o.Id, o => Point3d.Origin),
+                    .GetObjectList(Rhino.DocObjects.ObjectType.AnyObject)
+                    .ToDictionary(o => o.Id, o => Point3d.Origin),
                 CameraState = new CameraState()
                 {
                     PositionState = RhinoAppMappings.ActiveView.ActiveViewport.CameraLocation,
@@ -98,9 +108,6 @@ namespace Cinnamon.Models
                     FocalLengthState = RhinoAppMappings.ActiveView.ActiveViewport.Camera35mmLensLength,
                 }
             };
-            return baseState;
-        }
-
 
         #endregion
     }

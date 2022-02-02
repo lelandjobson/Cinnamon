@@ -8,11 +8,11 @@ namespace Cinnamon.Models.Effects
         public string Name { get; set; }
 
         public bool Local { get => _local; set => _local = value; }
+        private bool _local;
 
         public Guid Id => _id;
         private Guid _id = Guid.NewGuid();
 
-        private bool _local;
 
         public double StartingFocalLength { get; private set; }
         public double EndingFocalLength { get; private set; }
