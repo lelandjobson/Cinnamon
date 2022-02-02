@@ -1,2 +1,3 @@
 # Cinnamon
-Cinnamon gh component
+
+Good for your health!
