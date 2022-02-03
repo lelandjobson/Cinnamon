@@ -19,11 +19,12 @@ Cinnamon has two paradigms for manipulating object state:
 
 Setting up Cinnamon
 
-- Installing Cinnamon
+- See the latest release on the Releases page
 
 Setting Up your Document
 
 - Remember, Cinnamon directly changes the state of objects in the document: Work within a copy of your Rhino model which will serve as your “stage” model.
+- See the example file in the release (.3dm & .gh files)
 
 Known limitations
 
