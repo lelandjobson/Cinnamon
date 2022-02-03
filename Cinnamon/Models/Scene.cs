@@ -20,12 +20,17 @@ namespace Cinnamon.Models
 
             if(Moments != null && moments.Count > 0)
             {
-                Range = new TimelineTime()
-                {
-                    Start = moments.Min(m => m.Time.Start),
-                    End = moments.Max(m => m.Time.End)
-                };
+                RecalcRange();
             }
+        }
+
+        void RecalcRange()
+        {
+            Range = new TimelineTime()
+            {
+                Start = Moments.Min(m => m.Time.Start),
+                End = Moments.Max(m => m.Time.End)
+            };
         }
 
         public IEnumerable<Moment> GetMoments()
@@ -42,11 +47,13 @@ namespace Cinnamon.Models
         public void AddMomentToEnd(Moment m)
         {
             Moments.Add(new Moment(m.Time.Push(this.Range.End), m.Curve, m.GetEffects()));
+            RecalcRange();
         }
 
         public void AddMomentsToEnd(List<Moment> moments)
         {
             moments?.ForEach(m => AddMomentToEnd(m));
+            RecalcRange();
         }
 
         public static Scene Compile(List<Scene> scenes, SceneCompilationStrategy strat, double gap = 0)

@@ -68,10 +68,19 @@ namespace Cinnamon
             }
         }
 
-        internal static double Remap(this int value, int fromMin, int fromMax, double toMin = 0, double toMax = 1.0)
+        internal static double Remap(this int from, int fromMin, int fromMax, double toMin, double toMax)
         {
-            double perc = (value * 1.0 / (fromMax - fromMin));
-            return (perc * (toMax - toMin)) + toMin;
+            var fromAbs = from - fromMin;
+            var fromMaxAbs = fromMax - fromMin;
+
+            var normal = (fromAbs * 1.0) / (fromMaxAbs * 1.0);
+
+            var toMaxAbs = toMax - toMin;
+            var toAbs = toMaxAbs * normal;
+
+            var to = toAbs + toMin;
+
+            return to;
         }
 
         /// <summary>

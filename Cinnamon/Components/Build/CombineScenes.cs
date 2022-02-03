@@ -1,6 +1,7 @@
 using Cinnamon.Models;
 using Grasshopper;
 using Grasshopper.Kernel;
+using Grasshopper.Kernel.Parameters;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
@@ -29,6 +30,10 @@ namespace Cinnamon.Components.Create
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddGenericParameter("Scenes", "Scenes", "", GH_ParamAccess.list);
+            pManager.AddIntegerParameter("CompilationStrategy", "CompStrat", "", GH_ParamAccess.item, 1);
+
+            var p = pManager[1] as Param_Integer;
+            p.AddNamedValuesForEnum(typeof(SceneCompilationStrategy));
         }
 
         /// <summary>
@@ -47,16 +52,13 @@ namespace Cinnamon.Components.Create
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             List<Scene> scenes = new List<Scene>();
-            string compilationStrategy = "";
+            int compilationStrategy = 1;
             if (!DA.GetDataList<Scene>(0, scenes)) { return; }
-            DA.GetData<string>(1, ref compilationStrategy);
+            DA.GetData<int>(1, ref compilationStrategy);
 
             // Default is sequence
             SceneCompilationStrategy strat = SceneCompilationStrategy.Sequence;
-            if (!string.IsNullOrEmpty(compilationStrategy))
-            {
-                strat = (SceneCompilationStrategy)Enum.Parse(typeof(SceneCompilationStrategy), compilationStrategy);
-            }
+            strat = (SceneCompilationStrategy)compilationStrategy;
 
             var scene = Scene.Compile(scenes,strat);
 

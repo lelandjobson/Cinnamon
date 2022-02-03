@@ -34,6 +34,7 @@ namespace Cinnamon.Components.Create
             pManager.AddIntegerParameter("Style", "Style", "", GH_ParamAccess.item, 0);
             pManager.AddGenericParameter("TimeRange", "TimeRange", "", GH_ParamAccess.item);
 
+            pManager[0].Optional = true;
             pManager[0].DataMapping = GH_DataMapping.Flatten;
             var pint = pManager[1] as Param_Integer;
             pint.AddNamedValuesForEnum(typeof(AnimationCurve));
@@ -56,9 +57,10 @@ namespace Cinnamon.Components.Create
         {
             List<IEffect> effects = new List<IEffect>();
             int curve = 0;
-            TimelineTime range = TimelineTime.Empty; 
+            TimelineTime range = TimelineTime.Empty;
 
-            if (!DA.GetDataList<IEffect>(0, effects)) { return; }
+
+            DA.GetDataList<IEffect>(0, effects);
             if (!DA.GetData<int>(1, ref curve)){ }
             if (!DA.GetData<TimelineTime>(2, ref range)){ return;  }
 

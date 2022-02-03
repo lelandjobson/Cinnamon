@@ -92,12 +92,12 @@ namespace Cinnamon.Models
                     {
                         if (!m.IsValid) { continue; }
                         int frameStart = Math.Floor(m.Time.Start * Fps).ToInt32();
-                        int frameDuration = Math.Ceiling(m.Time.Duration * Fps).ToInt32();
-                        for (int i = frameStart; i < frameDuration; i++)
+                        int frameEnd = Math.Ceiling((m.Time.Duration * Fps)+ frameStart).ToInt32();
+                        for (int i = frameStart; i < frameEnd; i++)
                         {
                             if (_frames[i] == null) { _frames[i] = new FrameState(this, i); }
                             FrameState frameState = _frames[i];
-                            double effectPerc = AnimationCurveExtensions.GetNormalizedValue(m.Curve, i.Remap(frameStart, frameDuration, 0, 1));
+                            double effectPerc = AnimationCurveExtensions.GetNormalizedValue(m.Curve, i.Remap(frameStart, frameEnd, 0, 1));
                             foreach (var e in m.GetEffects())
                             {
                                 e.SetFrameStateValue(effectPerc, frameState);
