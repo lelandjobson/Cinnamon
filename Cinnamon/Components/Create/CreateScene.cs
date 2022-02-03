@@ -58,7 +58,7 @@ namespace Cinnamon.Components.Create
 
             var scene = new Scene(name, moments);
 
-            this.Message = $"{scene.Range.Duration} second scene starting at {scene.Range.Start} and ending at {scene.Range.End}";
+            this.Message = $"{scene.Range.Duration} second scene \n starting at {scene.Range.Start} \n and ending at {scene.Range.End}";
 
             DA.SetData(0, scene);
         }

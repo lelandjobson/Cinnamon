@@ -52,6 +52,7 @@ namespace Cinnamon.Components.Create
         /// to store data in output parameters.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
+            this.Message = "";
             List<Scene> scenes = new List<Scene>();
             int compilationStrategy = 1;
             double gap = 0;
@@ -64,6 +65,8 @@ namespace Cinnamon.Components.Create
             strat = (SceneCompilationStrategy)compilationStrategy;
 
             var scene = Scene.Compile(scenes,strat, gap);
+
+            this.Message = $"{scene.Range.Duration} second scene \n starting at {scene.Range.Start} \n and ending at {scene.Range.End}";
 
             DA.SetData(0, scene);
         }
