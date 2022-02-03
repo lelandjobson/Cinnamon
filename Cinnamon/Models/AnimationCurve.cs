@@ -2,7 +2,7 @@
 {
     public enum AnimationCurve
     {
-        Null = -1,
+        //Null = -1,
         Linear,
         EaseIn,
         EaseOut,

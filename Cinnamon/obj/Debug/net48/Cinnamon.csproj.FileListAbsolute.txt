@@ -8,3 +8,4 @@ C:\Users\Leland\Documents\GitHub\Cinnamon\Cinnamon\obj\Debug\net48\Cinnamon.gha
 C:\Users\Leland\Documents\GitHub\Cinnamon\Cinnamon\obj\Debug\net48\Cinnamon.pdb
 C:\Users\Leland\Documents\GitHub\Cinnamon\Cinnamon\obj\Debug\net48\Cinnamon.Properties.Resources.resources
 C:\Users\Leland\Documents\GitHub\Cinnamon\Cinnamon\obj\Debug\net48\Cinnamon.csproj.GenerateResource.cache
+C:\Users\Leland\Documents\GitHub\Cinnamon\Cinnamon\obj\Debug\net48\Cinnamon.csproj.AssemblyReference.cache

@@ -31,8 +31,13 @@ namespace Cinnamon
         private Movie _movie;
 
 
-        private Dictionary<Guid, RhinoObject> _docObjects => __docObjects ?? (__docObjects = Rhino.RhinoDoc.ActiveDoc.Objects.GetObjectList(Rhino.DocObjects.ObjectType.AnyObject).ToDictionary(o => o.Id, o => o));
-        private Dictionary<Guid, RhinoObject> __docObjects;
+        private static Dictionary<Guid, RhinoObject> _docObjects => __docObjects ?? (__docObjects = Rhino.RhinoDoc.ActiveDoc.Objects.GetObjectList(Rhino.DocObjects.ObjectType.AnyObject).ToDictionary(o => o.Id, o => o));
+        private static Dictionary<Guid, RhinoObject> __docObjects;
+
+        /// <summary>
+        /// Resets the cache of docobjects
+        /// </summary>
+        public static void ExpireDocObjects() => __docObjects = null;
 
         public void Reset()
         {
@@ -107,6 +112,12 @@ namespace Cinnamon
                     }
                     ls.Key.IsVisible = ls.Value.IsVisible;
                 }
+            }
+
+            // Frame actions
+            foreach(var a in curState.FrameActions)
+            {
+                a.Invoke(curState);
             }
 
             // Animating Objects

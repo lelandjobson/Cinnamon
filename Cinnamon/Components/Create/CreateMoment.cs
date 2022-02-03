@@ -2,6 +2,7 @@ using Cinnamon.Models;
 using Cinnamon.Models.Effects;
 using Grasshopper;
 using Grasshopper.Kernel;
+using Grasshopper.Kernel.Parameters;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
@@ -30,8 +31,12 @@ namespace Cinnamon.Components.Create
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddGenericParameter("Effects", "Effects", "", GH_ParamAccess.list);
-            pManager.AddTextParameter("Style", "Style", "", GH_ParamAccess.item, "Linear");
+            pManager.AddIntegerParameter("Style", "Style", "", GH_ParamAccess.item, 0);
             pManager.AddGenericParameter("TimeRange", "TimeRange", "", GH_ParamAccess.item);
+
+            pManager[0].DataMapping = GH_DataMapping.Flatten;
+            var pint = pManager[1] as Param_Integer;
+            pint.AddNamedValuesForEnum(typeof(AnimationCurve));
         }
 
         /// <summary>
@@ -50,17 +55,17 @@ namespace Cinnamon.Components.Create
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             List<IEffect> effects = new List<IEffect>();
-            string curve = String.Empty;
+            int curve = 0;
             TimelineTime range = TimelineTime.Empty; 
 
             if (!DA.GetDataList<IEffect>(0, effects)) { return; }
-            if (!DA.GetData<string>(1, ref curve)){ }
+            if (!DA.GetData<int>(1, ref curve)){ }
             if (!DA.GetData<TimelineTime>(2, ref range)){ return;  }
 
             if(effects.Count == 0) { return; }
 
             AnimationCurve c = AnimationCurve.Linear;
-            if (!string.IsNullOrEmpty(curve)) { AnimationCurve.TryParse(curve, out c); }
+            c = (AnimationCurve)curve;
 
             var mom = new Moment(range, c, effects);
 

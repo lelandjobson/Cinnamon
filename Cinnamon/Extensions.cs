@@ -1,4 +1,5 @@
-﻿using Rhino.DocObjects;
+﻿using Grasshopper.Kernel.Parameters;
+using Rhino.DocObjects;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
@@ -37,11 +38,20 @@ namespace Cinnamon
             var objs = RhinoAppMappings.ObjectsOnLayer(l);
             HashSet<Material> mats = 
                 objs.Select(o => o.GetMaterial(false))
-                    .Where(m => m != null && m != default(Material))
+                    .Where(m => m != null && m != default(Material) && !m.IsDocumentControlled)
                     .ToHashSet();
             foreach(var m in mats)
             {
                 m.Transparency = trans;
+            }
+        }
+
+        internal static void AddNamedValuesForEnum(this Param_Integer pint, Type enumType)
+        {
+            var names = Enum.GetNames(enumType);
+            for(int i = 0; i < names.Length; i++)
+            {
+                pint.AddNamedValue(names[i], i);
             }
         }
 

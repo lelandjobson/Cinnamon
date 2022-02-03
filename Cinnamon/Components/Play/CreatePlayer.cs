@@ -1,4 +1,5 @@
 using Cinnamon.Models;
+using Cinnamon.Models.Effects;
 using Grasshopper;
 using Grasshopper.Kernel;
 using Rhino.Geometry;
@@ -54,7 +55,12 @@ namespace Cinnamon.Components.Create
             double seek = 0;
             bool byFrame = false;
 
-            if (!DA.GetData<Movie>(0, ref m)) { return; }
+            if (!DA.GetData<Movie>(0, ref m)) {
+                // Check if its an effect instead
+                IEffect effect = null;
+                if(!DA.GetData(0, ref effect)) { return; }
+                m = Movie.OfJustOneEffect(effect,3);
+            }
             if (!DA.GetData<double>(1, ref seek)) { return; }
             DA.GetData(2, ref byFrame);
 

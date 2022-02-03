@@ -141,5 +141,19 @@ namespace Cinnamon.Models
                 Logger.LogException(e); 
             }
         }
+
+        internal static Movie OfJustOneEffect(IEffect effect, int duration = 1, int frameRate = 30)
+        {
+            return new Movie(
+                new List<Scene>() {
+                    new Scene("TestingScene",
+                    new List<Moment>() {
+                        new Moment(
+                            new TimelineTime() { Start = 0, End = duration },
+                            AnimationCurve.Linear,
+                            new List<IEffect>() { effect })
+                    })
+                }, frameRate);
+        }
     }
 }

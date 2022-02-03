@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Cinnamon.Models
 {
@@ -110,110 +111,8 @@ namespace Cinnamon.Models
 
         };
 
-        static List<double> _easeOut = new List<double>()
-        {
-            0,
-            0.27104,
-            0.368603,
-            0.437109,
-            0.490757,
-            0.535023,
-            0.572704,
-            0.605455,
-            0.634351,
-            0.660134,
-            0.683343,
-            0.704384,
-            0.723568,
-            0.741146,
-            0.757317,
-            0.772245,
-            0.786068,
-            0.798901,
-            0.810841,
-            0.821975,
-            0.832373,
-            0.842101,
-            0.851215,
-            0.859763,
-            0.86779,
-            0.875335,
-            0.882433,
-            0.889116,
-            0.895414,
-            0.901351,
-            0.906951,
-            0.912237,
-            0.917228,
-            0.921942,
-            0.926396,
-            0.930606,
-            0.934585,
-            0.938348,
-            0.941906,
-            0.945271,
-            0.948454,
-            0.951464,
-            0.954311,
-            0.957004,
-            0.95955,
-            0.961959,
-            0.964235,
-            0.966388,
-            0.968423,
-            0.970345,
-            0.972161,
-            0.973877,
-            0.975497,
-            0.977026,
-            0.978469,
-            0.97983,
-            0.981113,
-            0.982323,
-            0.983463,
-            0.984536,
-            0.985546,
-            0.986496,
-            0.98739,
-            0.988231,
-            0.98902,
-            0.989761,
-            0.990457,
-            0.991109,
-            0.991721,
-            0.992295,
-            0.992832,
-            0.993335,
-            0.993807,
-            0.994247,
-            0.99466,
-            0.995046,
-            0.995407,
-            0.995745,
-            0.996062,
-            0.996358,
-            0.996636,
-            0.996896,
-            0.997141,
-            0.997372,
-            0.997589,
-            0.997794,
-            0.997988,
-            0.998172,
-            0.998348,
-            0.998517,
-            0.998679,
-            0.998836,
-            0.998988,
-            0.999136,
-            0.999282,
-            0.999426,
-            0.999569,
-            0.999712,
-            0.999855,
-            1,
-
-        };
+        static List<double> _easeOut => __easeOut ?? (__easeOut = _easeOut.OrderBy(c => -c - 1).ToList());
+        static List<double> __easeOut;
 
         static List<double> _easeInOut = new List<double>()
         {
@@ -327,7 +226,7 @@ namespace Cinnamon.Models
             switch (curve)
             {
                 case AnimationCurve.Linear:
-                case AnimationCurve.Null:
+                //case AnimationCurve.Null:
                     return value;
                 case AnimationCurve.EaseIn:
                     return GetInterp(value, _easeIn);
@@ -348,10 +247,10 @@ namespace Cinnamon.Models
         static double GetInterp(double input, List<double> output)
         {
             double mult = input * 100;
-            int flor = Convert.ToInt32(Math.Ceiling(mult));
-            int ceil = Convert.ToInt32(Math.Floor(mult));
+            int flor = Convert.ToInt32(Math.Floor(mult));
+            int ceil = Convert.ToInt32(Math.Ceiling(mult));
             if(flor == ceil) { return output[flor]; }
-            return ((output[ceil] - output[flor]) * (mult % 1)) + output[flor];
+            return ((output[ceil] - output[flor]) * input) + output[flor];
         }
     }
 }

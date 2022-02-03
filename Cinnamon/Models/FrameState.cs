@@ -25,6 +25,8 @@ namespace Cinnamon.Models
 
         public CameraState CameraState = new CameraState();
 
+        public List<Action<FrameState>> FrameActions = new List<Action<FrameState>>();
+
         public Dictionary<Guid, Point3d> ObjectPositionStates
         {
             get

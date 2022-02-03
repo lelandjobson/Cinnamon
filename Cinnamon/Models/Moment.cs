@@ -29,7 +29,11 @@ namespace Cinnamon.Models
         {
             Time = time;
             Curve = curve;
-            if(effects != null) { foreach (var e in effects) { AddEffect(e); } } 
+            if(effects != null) { foreach (var e in effects) { AddEffect(e); } }
+
+            // This is to ensure any effects with new rhinoobjects
+            // have their objects in the cache.
+            Player.ExpireDocObjects();
         }
 
         public void AddEffect(IEffect effect)
@@ -47,6 +51,6 @@ namespace Cinnamon.Models
                 );
         }
 
-        public static Moment Empty(double duration) => new Moment(new TimelineTime() { Start = 0, End = duration }, AnimationCurve.Null, null);
+        public static Moment Empty(double duration) => new Moment(new TimelineTime() { Start = 0, End = duration }, AnimationCurve.Linear, null);
     }
 }

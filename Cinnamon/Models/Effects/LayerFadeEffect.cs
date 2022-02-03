@@ -45,17 +45,19 @@ namespace Cinnamon.Models.Effects
         {
             if (!IsValid) { return; }
 
-            // Get layers
-            foreach (var n in _layers)
+            state.FrameActions.Add((s) =>
             {
-                double transparencyVal = percentage.PercToValue(_startTrans, _endTrans);
-                var l = RhinoAppMappings.DocumentLayers.FindName(n);
-                if (l == null || l == default(Layer))
+                foreach (var n in _layers)
                 {
-                    continue;
+                    double transparencyVal = percentage.PercToValue(_startTrans, _endTrans);
+                    var l = RhinoAppMappings.DocumentLayers.FindName(n);
+                    if (l == null || l == default(Layer))
+                    {
+                        continue;
+                    }
+                    l.SetTransparency(transparencyVal);
                 }
-                l.SetTransparency(transparencyVal);
-            }
+            });
         }
     }
 }
