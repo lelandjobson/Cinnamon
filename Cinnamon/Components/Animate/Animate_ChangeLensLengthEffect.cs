@@ -2,14 +2,13 @@ using Cinnamon.Models;
 using Cinnamon.Models.Effects;
 using Grasshopper;
 using Grasshopper.Kernel;
-using Rhino.DocObjects;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
 
 namespace Cinnamon.Components.Create
 {
-    public class Create_ChangeLayerTransparencyEffect : GH_Component
+    public class Animate_ChangeLensLengthEffect : GH_Component
     {
         /// <summary>
         /// Each implementation of GH_Component must provide a public 
@@ -18,10 +17,10 @@ namespace Cinnamon.Components.Create
         /// Subcategory the panel. If you use non-existing tab or panel names, 
         /// new tabs/panels will automatically be created.
         /// </summary>
-        public Create_ChangeLayerTransparencyEffect()
-          : base("ChangeLayerTransparency", "ChangeLayerTransparency",
-            "Changes the transparency of the materials on objects on layers",
-            "Cinnamon", "1_Effects")
+        public Animate_ChangeLensLengthEffect()
+          : base("ChangeLensLength", "ChangeLensLength",
+            "Changes the lens length of the camera over time",
+            "Cinnamon", "1_Animate")
         {
         }
 
@@ -30,11 +29,8 @@ namespace Cinnamon.Components.Create
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddTextParameter("Layers", "Layers", "", GH_ParamAccess.list);
             pManager.AddNumberParameter("Start", "Start", "", GH_ParamAccess.item);
             pManager.AddNumberParameter("End", "End", "", GH_ParamAccess.item);
-
-            //pManager.AddNumberParameter("States", "States", "", GH_ParamAccess.list);
         }
 
         /// <summary>
@@ -52,37 +48,15 @@ namespace Cinnamon.Components.Create
         /// to store data in output parameters.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            List<string> layerNames = new List<string>();
-            //List<bool> layerStates = new List<bool>();
             double start = 0;
             double end = 0;
 
-            if (!DA.GetDataList(0, layerNames)) { return; }
-            if(!DA.GetData(1, ref start)) { return; }
-            if(!DA.GetData(2, ref end)) { return; }
+            if (!DA.GetData<double>(0, ref start)){ return; }
+            if (!DA.GetData<double>(1, ref end)){ return; }
 
-            var transEffect = new LayerFadeEffect(layerNames, start, end);
+            var eff = new FocalLengthEffect(start,end);
 
-            DA.SetData(0, transEffect);
-
-
-            //if(!DA.GetDataList(1, layerStates)) { return; }
-
-            // LJ
-            // TODO
-            // Consider warnings system which passes through
-
-            // effects setting.
-            //List<string> warnings = new List<string>();
-
-            //if(warnings.Count > 0)
-            //{
-            //    this.Message = String.Join("\n", warnings);
-            //}
-            //else
-            //{
-            //    this.Message = String.Empty;
-            //}
+            DA.SetData(0, eff);
         }
 
         /// <summary>
@@ -91,13 +65,13 @@ namespace Cinnamon.Components.Create
         /// You can add image files to your project resources and access them like this:
         /// return Resources.IconForThisComponent;
         /// </summary>
-        protected override System.Drawing.Bitmap Icon => Properties.Resources.eff_01; 
+        protected override System.Drawing.Bitmap Icon => Properties.Resources.eff_02;
 
         /// <summary>
         /// Each component must have a unique Guid to identify it. 
         /// It is vital this Guid doesn't change otherwise old ghx files 
         /// that use the old ID will partially fail during loading.
         /// </summary>
-        public override Guid ComponentGuid => new Guid("FB22DAAA-B288-4EC3-BB73-1A3435148C61");
+        public override Guid ComponentGuid => new Guid("FB22DA7D-B288-4EC3-BB73-1A3435148C61");
     }
 } 

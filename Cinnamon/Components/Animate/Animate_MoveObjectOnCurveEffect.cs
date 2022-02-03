@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace Cinnamon.Components.Create
 {
-    public class Create_MoveObjectOnCurveEffect : GH_Component
+    public class Animate_MoveObjectOnCurveEffect : GH_Component
     {
         /// <summary>
         /// Each implementation of GH_Component must provide a public 
@@ -17,10 +17,10 @@ namespace Cinnamon.Components.Create
         /// Subcategory the panel. If you use non-existing tab or panel names, 
         /// new tabs/panels will automatically be created.
         /// </summary>
-        public Create_MoveObjectOnCurveEffect()
+        public Animate_MoveObjectOnCurveEffect()
           : base("MoveObjectOnCurve", "MoveObjectOnCurve",
             "Moves an object along a curve",
-            "Cinnamon", "1_Effects")
+            "Cinnamon", "1_Animate")
         {
         }
 

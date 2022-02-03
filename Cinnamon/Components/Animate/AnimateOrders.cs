@@ -11,7 +11,7 @@ using System.Linq;
 
 namespace Cinnamon.Components.Create
 {
-    public class MovementFromOrders : GH_Component
+    public class AnimateOrders : GH_Component
     {
         /// <summary>
         /// Each implementation of GH_Component must provide a public 
@@ -20,10 +20,10 @@ namespace Cinnamon.Components.Create
         /// Subcategory the panel. If you use non-existing tab or panel names, 
         /// new tabs/panels will automatically be created.
         /// </summary>
-        public MovementFromOrders()
-          : base("MovementFromOrders", "MovementFromOrders",
+        public AnimateOrders()
+          : base("AnimateOrders ", "AnimateOrders ",
             "Creates a movement from orders",
-            "Cinnamon", "1_Effects")
+            "Cinnamon", "1_Animate")
         {
         }
 
