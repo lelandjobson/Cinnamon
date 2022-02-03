@@ -6,18 +6,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Cinnamon.Components.CameraTools
+namespace Cinnamon.Components.Object_Rec
 {
-    public static class OrderManager
+
+    public class OrderManager_Object
     {
-        public static event EventHandler OrderChanged;
-
-        public const string CAMERA_ORDERSPARENTNAME = "cinnamon_cameras";
-
-        public const string POINTNAME_CAMERALOCATION = "loc";
-        public const string POINTNAME_CAMERATARGET   = "tar";
-
-        public static List<int> Orders
+        public event EventHandler OrderChanged;
+        public List<int> Orders
         {
             get
             {
@@ -25,36 +20,47 @@ namespace Cinnamon.Components.CameraTools
                 return _orders?.ToList() ?? new List<int>();
             }
         }
-        private static List<int> _orders;
-        private static List<Layer> _orderLayers;
+        private List<int> _orders;
+        private List<Layer> _orderLayers;
 
         private static LayerTable _rhlyrs => Rhino.RhinoDoc.ActiveDoc.Layers;
 
-        private static Layer _orderLayersParent
+        public const string POINTNAME_LOCATION = "objloc";
+
+        public readonly string ObjectId;
+        public readonly Guid ObjectIdGuid;
+
+        public OrderManager_Object(Guid objectId)
+        {
+            ObjectIdGuid = objectId;
+            ObjectId = objectId.ToString();
+        }
+
+        private Layer _orderLayersParent
         {
             get
             {
-                if(__orderLayersParent == null)
+                var parent = _rhlyrs.FindName(ObjectId);
+                if (parent == null)
                 {
-                    var parent = _rhlyrs.FirstOrDefault(l => l.Name.Equals(CAMERA_ORDERSPARENTNAME, StringComparison.OrdinalIgnoreCase));
-                    if(parent == null)
+                    // create parent layer
+                    var p = new Layer()
                     {
-                        // create parent layer
-                        var p = new Layer() { 
-                            Name = CAMERA_ORDERSPARENTNAME, 
-                            IsVisible = false, 
-                            IsLocked = true 
-                        };
-                        _rhlyrs.Add(p);
-                        __orderLayersParent = p;
-                    }
+                        Name = ObjectId,
+                        IsVisible = false,
+                        IsLocked = true
+                    };
+                    _rhlyrs.Add(p);
+                    return _rhlyrs.FindName(ObjectId);
                 }
-                return __orderLayersParent;
+                else
+                {
+                    return parent;
+                }
             }
         }
-        private static Layer __orderLayersParent;
 
-        public static int Next
+        public int Next
         {
             get
             {
@@ -64,7 +70,7 @@ namespace Cinnamon.Components.CameraTools
             }
         }
 
-        static void RegenOrderData()
+        void RegenOrderData()
         {
             // gather doc layers
             _orders = null;
@@ -84,30 +90,25 @@ namespace Cinnamon.Components.CameraTools
             //OrderChanged?.Invoke(null, null);
         }
 
-        internal static CameraState GetOrderData(int order)
+        internal ObjectState GetOrderData(int order)
         {
             if (!Orders.Contains(order)) { return null; }
             int idx = Orders.IndexOf(order);
             var objs = Rhino.RhinoDoc.ActiveDoc.Objects.FindByLayer(_orderLayers[idx]);
-            CameraState output = new CameraState();
+            ObjectState output = new ObjectState(this.ObjectIdGuid);
             foreach(var o in objs)
             {
-                if (o.Name.Contains(POINTNAME_CAMERALOCATION))
+                if (o.Name.Contains(POINTNAME_LOCATION))
                 {
                     double focalLength = RhinoAppMappings.ActiveViewport.Camera35mmLensLength;
                     double.TryParse(o.Name.Split('_').Last(), out focalLength);
-                    output.FocalLengthState = focalLength;
                     output.PositionState = (o.Geometry as Point).Location;
-                }
-                else if (o.Name.Contains(POINTNAME_CAMERATARGET))
-                {
-                    output.TargetPositionState = (o.Geometry as Point).Location;
                 }
             }
             return output;
         }
 
-        public static void CreateNewOrder(int order, Point3d cameraLocation = default(Point3d), Point3d cameraTarget = default(Point3d))
+        public void CreateNewOrder(int order, Point3d location = default(Point3d))
         {
             Layer l = null;
             int lyrIndex = -1;
@@ -123,31 +124,25 @@ namespace Cinnamon.Components.CameraTools
                 l = new Layer() {
                     Name = order.ToString(),
                     IsVisible = false,
-                    IsLocked = true
+                    IsLocked = true,
+                    ParentLayerId = _orderLayersParent.Id
                 };
                 lyrIndex = Rhino.RhinoDoc.ActiveDoc.Layers.Add(l);
                 l.ParentLayerId = _orderLayersParent.Id;
                 RegenOrderData();
             }
-            if(cameraLocation == default(Point3d))
-            {
-                cameraLocation = RhinoAppMappings.ActiveViewport.CameraLocation;
-            }
-            if(cameraTarget == default(Point3d))
-            {
-                cameraTarget = RhinoAppMappings.ActiveViewport.CameraTarget;
-            }
-
-            // get layer index
 
             // Create objects
-            Rhino.RhinoDoc.ActiveDoc.Objects.AddPoint(cameraLocation, new ObjectAttributes() { LayerIndex = lyrIndex, Name = POINTNAME_CAMERALOCATION + "_" + RhinoAppMappings.ActiveViewport.Camera35mmLensLength });
-            Rhino.RhinoDoc.ActiveDoc.Objects.AddPoint(cameraTarget, new ObjectAttributes() { LayerIndex = lyrIndex, Name = POINTNAME_CAMERATARGET });
+            Rhino.RhinoDoc.ActiveDoc.Objects.AddPoint(
+                location,
+                new ObjectAttributes() { 
+                    LayerIndex = lyrIndex, 
+                    Name = POINTNAME_LOCATION });
 
             // donezo
         }
 
-        public static bool ClearOrderData(int order, out Layer layer)
+        public bool ClearOrderData(int order, out Layer layer)
         {
             layer = null;
             if (!_orders.Contains(order)) { return false; }

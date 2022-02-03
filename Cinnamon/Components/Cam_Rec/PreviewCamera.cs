@@ -9,7 +9,7 @@ using System.Collections.Generic;
 namespace Cinnamon.Components.CameraTools
 {
 
-    public class PreviewCamera : GH_Component
+    public class PreviewOrder : GH_Component
     {
         /// <summary>
         /// Each implementation of GH_Component must provide a public 
@@ -18,10 +18,10 @@ namespace Cinnamon.Components.CameraTools
         /// Subcategory the panel. If you use non-existing tab or panel names, 
         /// new tabs/panels will automatically be created.
         /// </summary>
-        public PreviewCamera()
+        public PreviewOrder()
           : base("PreviewCamera", "PreviewCamera",
             "Previews a camera from the document",
-            "Cinnamon", "0_CameraTools")
+            "Cinnamon", "0A_Cam-Rec")
         {
         }
 

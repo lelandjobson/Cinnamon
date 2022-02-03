@@ -32,15 +32,29 @@ namespace Cinnamon.Models.Effects
             return new MoveCameraOnCurveEffect(this.CameraCurve, this.TargetCurve);
         }
 
+        Point3d GetValue(Curve curve, double percentage)
+        {
+            if (curve is PolylineCurve pc)
+            {
+                var plc = pc.ToPolyline();
+                var mapped = percentage / (1.0 / (plc.Count - 1));
+                int lower = Math.Floor(mapped).ToInt32();
+                int upper = lower + 1;
+                mapped -= lower;
+                return mapped.PercToValue(plc[lower], plc[upper]);
+            }
+            return curve.PointAtNormalizedLength(percentage);
+        }
+
         public void SetFrameStateValue(double percentage, FrameState state)
         {
             if(CameraCurve != null)
             {
-                state.CameraState.PositionState = CameraCurve.PointAt(percentage);
+                state.CameraState.PositionState = GetValue(CameraCurve,percentage);
             }
             if(TargetCurve != null)
             {
-                state.CameraState.TargetPositionState = TargetCurve.PointAt(percentage);
+                state.CameraState.TargetPositionState = GetValue(TargetCurve,percentage);
             }
         }
     }

@@ -10,6 +10,12 @@ namespace Cinnamon
 {
     internal static class Extensions
     {
+        internal static RhinoObject ToDocumentObject(this Guid id) => Rhino.RhinoDoc.ActiveDoc.Objects.Find(id);
+
+        internal static Point3d ToBBPoint(this RhinoObject ro) => ro.Geometry?.GetBoundingBox(true).Center ?? Point3d.Unset;
+
+        internal static Vector3d GetOrderTransform(this RhinoObject ro, Point3d toPoint) => toPoint - ro.ToBBPoint();
+
         internal static int ToInt32(this double d) => System.Convert.ToInt32(d);
 
         internal static double GetTransparency(this Layer l)
@@ -68,6 +74,15 @@ namespace Cinnamon
         internal static double PercToValue(this double p, double start, double end)
         {
             return ((end - start) * p) + start;
+        }
+
+        internal static Point3d PercToValue(this double p, Point3d start, Point3d end)
+        {
+            return new Point3d(
+                p.PercToValue(start.X, end.X),
+                p.PercToValue(start.Y, end.Y),
+                p.PercToValue(start.Z, end.Z)
+                );
         }
     }
 }

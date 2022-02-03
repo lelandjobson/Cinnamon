@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace Cinnamon.Components.Create
 {
-    public class CreateMoment : GH_Component
+    public class Create_MoveObjectOnCurveEffect : GH_Component
     {
         /// <summary>
         /// Each implementation of GH_Component must provide a public 
@@ -17,10 +17,10 @@ namespace Cinnamon.Components.Create
         /// Subcategory the panel. If you use non-existing tab or panel names, 
         /// new tabs/panels will automatically be created.
         /// </summary>
-        public CreateMoment()
-          : base("CreateMoment", "CreateMoment",
-            "Creates a moment from effects",
-            "Cinnamon", "2_Build")
+        public Create_MoveObjectOnCurveEffect()
+          : base("MoveObjectOnCurve", "MoveObjectOnCurve",
+            "Moves an object along a curve",
+            "Cinnamon", "1_Effects")
         {
         }
 
@@ -29,9 +29,8 @@ namespace Cinnamon.Components.Create
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("Effects", "Effects", "", GH_ParamAccess.list);
-            pManager.AddTextParameter("Style", "Style", "", GH_ParamAccess.item, "Linear");
-            pManager.AddGenericParameter("TimeRange", "TimeRange", "", GH_ParamAccess.item);
+            pManager.AddTextParameter("ObjectId", "ObjectId", "", GH_ParamAccess.item);
+            pManager.AddCurveParameter("LocationCurve", "Loc", "", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -39,7 +38,7 @@ namespace Cinnamon.Components.Create
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddGenericParameter("Moment", "Moment", "", GH_ParamAccess.item);
+            pManager.AddGenericParameter("Effect", "Effect", "", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -49,22 +48,17 @@ namespace Cinnamon.Components.Create
         /// to store data in output parameters.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            List<IEffect> effects = new List<IEffect>();
-            string curve = String.Empty;
-            TimelineTime range = TimelineTime.Empty; 
+            string oid = string.Empty;
+            Guid oidGuid;
+            Curve cur = null;
+            if (!DA.GetData<Curve>(1, ref cur)){ return; }
+            if(!DA.GetData(0, ref oid)) { return; }
+            if(!Guid.TryParse(oid, out oidGuid)) { return; }
 
-            if (!DA.GetDataList<IEffect>(0, effects)) { return; }
-            if (!DA.GetData<string>(1, ref curve)){ }
-            if (!DA.GetData<TimelineTime>(2, ref range)){ return;  }
 
-            if(effects.Count == 0) { return; }
+            var eff = new MoveObjectOnCurveEffect(oidGuid, cur);
 
-            AnimationCurve c = AnimationCurve.Linear;
-            if (!string.IsNullOrEmpty(curve)) { AnimationCurve.TryParse(curve, out c); }
-
-            var mom = new Moment(range, c, effects);
-
-            DA.SetData(0, mom);
+            DA.SetData(0, eff);
         }
 
         /// <summary>
@@ -73,13 +67,13 @@ namespace Cinnamon.Components.Create
         /// You can add image files to your project resources and access them like this:
         /// return Resources.IconForThisComponent;
         /// </summary>
-        protected override System.Drawing.Bitmap Icon => Properties.Resources.moment;
+        protected override System.Drawing.Bitmap Icon => Properties.Resources.eff_05;
 
         /// <summary>
         /// Each component must have a unique Guid to identify it. 
         /// It is vital this Guid doesn't change otherwise old ghx files 
         /// that use the old ID will partially fail during loading.
         /// </summary>
-        public override Guid ComponentGuid => new Guid("FA72DA7D-A788-4EC3-BB73-1A3435148C61");
+        public override Guid ComponentGuid => new Guid("FA72AAAA-B288-4EC3-BB73-1A3435148C61");
     }
 } 

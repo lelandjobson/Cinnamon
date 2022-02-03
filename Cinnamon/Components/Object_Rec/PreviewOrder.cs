@@ -1,14 +1,16 @@
-using Cinnamon.Models;
-using Cinnamon.Models.Effects;
+﻿using Cinnamon.Models;
 using Grasshopper;
 using Grasshopper.Kernel;
-using Rhino.Geometry;
+using Grasshopper.Kernel.Data;
+using Rhino.DocObjects.Custom;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
-namespace Cinnamon.Components.Create
+namespace Cinnamon.Components.Object_Rec
 {
-    public class Create_MoveCameraOnCurveEffect : GH_Component
+
+    public class PreviewOrder_Object : GH_Component
     {
         /// <summary>
         /// Each implementation of GH_Component must provide a public 
@@ -17,10 +19,10 @@ namespace Cinnamon.Components.Create
         /// Subcategory the panel. If you use non-existing tab or panel names, 
         /// new tabs/panels will automatically be created.
         /// </summary>
-        public Create_MoveCameraOnCurveEffect()
-          : base("MoveCameraOnCurve", "MoveCameraOnCurve",
-            "Moves the camera along a curve",
-            "Cinnamon", "1_Effects")
+        public PreviewOrder_Object()
+          : base("PreviewOrder", "PreviewOrder",
+            "Previews an object order from the document",
+            "Cinnamon", "0B_Obj-Rec")
         {
         }
 
@@ -29,15 +31,16 @@ namespace Cinnamon.Components.Create
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddCurveParameter("Curve", "C", "", GH_ParamAccess.item);
+            pManager.AddTextParameter("ObjectId", "ObjectId", "", GH_ParamAccess.item);
+            pManager.AddIntegerParameter("Order", "Order", "", GH_ParamAccess.item);
         }
+
 
         /// <summary>
         /// Registers all the output parameters for this component.
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddGenericParameter("Effect", "Effect", "", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -47,12 +50,23 @@ namespace Cinnamon.Components.Create
         /// to store data in output parameters.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            Curve cur = null;
-            if (!DA.GetData<Curve>(0, ref cur)){ return; }
+            this.Message = string.Empty;
 
-            var eff = new MoveCameraOnCurveEffect(cur);
+            int order = -1;
+            string id = "";
+            if(!DA.GetData(0, ref id)){ return; }
+            if(!DA.GetData(1, ref order)){ return; }
+            if(!Guid.TryParse(id, out Guid gid)) { return; }
 
-            DA.SetData(0, eff);
+            if (!Document_OrderManagers.ContainsOrder(gid))
+            {
+                this.Message = "No orders found in the document for this object";
+                return;
+            }
+
+            var objState = Document_OrderManagers.GetOrCreateOrderManager(gid).GetOrderData(order);
+
+            Player.MainPlayer.RenderObjectState(objState);
         }
 
         /// <summary>
@@ -61,13 +75,13 @@ namespace Cinnamon.Components.Create
         /// You can add image files to your project resources and access them like this:
         /// return Resources.IconForThisComponent;
         /// </summary>
-        protected override System.Drawing.Bitmap Icon => Properties.Resources.eff_03;
+        protected override System.Drawing.Bitmap Icon => Properties.Resources.play_02;
 
         /// <summary>
         /// Each component must have a unique Guid to identify it. 
         /// It is vital this Guid doesn't change otherwise old ghx files 
         /// that use the old ID will partially fail during loading.
         /// </summary>
-        public override Guid ComponentGuid => new Guid("FA72DA7D-B288-4EC3-BB73-1A3435148C61");
+        public override Guid ComponentGuid => new Guid("C655BA31-752A-4FE5-896F-1D8D8A4A153C");
     }
-} 
+}

@@ -1,15 +1,14 @@
-﻿using Cinnamon.Models;
+using Cinnamon.Components.CameraTools;
+using Cinnamon.Models;
 using Grasshopper;
 using Grasshopper.Kernel;
-using Grasshopper.Kernel.Data;
-using Rhino.DocObjects.Custom;
+using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
 
-namespace Cinnamon.Components.CameraTools
+namespace Cinnamon.Components.Create
 {
-
-    public class SaveCameraLocation : GH_Component
+    public class NextOrder : GH_Component
     {
         /// <summary>
         /// Each implementation of GH_Component must provide a public 
@@ -18,29 +17,29 @@ namespace Cinnamon.Components.CameraTools
         /// Subcategory the panel. If you use non-existing tab or panel names, 
         /// new tabs/panels will automatically be created.
         /// </summary>
-        public SaveCameraLocation()
-          : base("SaveCameraLocation", "SaveCameraLocation",
-            "Captures the current camera location and saves it to an order.",
-            "Cinnamon", "0_CameraTools")
+        public NextOrder()
+          : base("NextOrder", "NextOrder",
+            "Provides the next order",
+            "Cinnamon", "0A_Cam-Rec")
         {
         }
 
-        private static int _nextOrderUp => OrderManager.Next;
+        private static int _order = 0;
 
         /// <summary>
         /// Registers all the input parameters for this component.
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddIntegerParameter("Order", "Order", "", GH_ParamAccess.item,_nextOrderUp);
-            pManager.AddBooleanParameter("Save", "Save", "", GH_ParamAccess.item, false);
+            pManager.AddBooleanParameter("Reset", "Reset", "", GH_ParamAccess.item);
         }
 
         /// <summary>
         /// Registers all the output parameters for this component.
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
-        { 
+        {
+            pManager.AddNumberParameter("NextOrder", "NextOrder", "", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -50,19 +49,9 @@ namespace Cinnamon.Components.CameraTools
         /// to store data in output parameters.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            int order = -1;
-            bool run = false;
-            DA.GetData(0, ref order);
-            DA.GetData(1, ref run);
-
-            if (!run) { return; }
-
-            OrderManager.CreateNewOrder(order);
-            //var p = new GH_Path();
-            //p.AppendElement(0);
-
-            //// test if this works
-            //this.Params.Input[0].AddVolatileData(p, 0, _nextOrderUp);
+            _order = OrderManager.Next;
+            this.Message = $"{_order}";
+            DA.SetData(0, _order);
         }
 
         /// <summary>
@@ -71,13 +60,13 @@ namespace Cinnamon.Components.CameraTools
         /// You can add image files to your project resources and access them like this:
         /// return Resources.IconForThisComponent;
         /// </summary>
-        protected override System.Drawing.Bitmap Icon => Properties.Resources.rec_01;
+        protected override System.Drawing.Bitmap Icon => Properties.Resources.next_01;
 
         /// <summary>
         /// Each component must have a unique Guid to identify it. 
         /// It is vital this Guid doesn't change otherwise old ghx files 
         /// that use the old ID will partially fail during loading.
         /// </summary>
-        public override Guid ComponentGuid => new Guid("FE72DA7D-A788-4AA3-BB73-9B3435148A23");
+        public override Guid ComponentGuid => new Guid("AAA1DC7D-A788-4EC3-BB73-9A3435148C63");
     }
 }

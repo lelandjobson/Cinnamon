@@ -1,14 +1,15 @@
-using Cinnamon.Models;
-using Cinnamon.Models.Effects;
+﻿using Cinnamon.Models;
 using Grasshopper;
 using Grasshopper.Kernel;
-using Rhino.Geometry;
+using Grasshopper.Kernel.Data;
+using Rhino.DocObjects.Custom;
 using System;
 using System.Collections.Generic;
 
-namespace Cinnamon.Components.Create
+namespace Cinnamon.Components.Object_Rec
 {
-    public class CreateMoment : GH_Component
+
+    public class SavedObjectOrders : GH_Component
     {
         /// <summary>
         /// Each implementation of GH_Component must provide a public 
@@ -17,10 +18,10 @@ namespace Cinnamon.Components.Create
         /// Subcategory the panel. If you use non-existing tab or panel names, 
         /// new tabs/panels will automatically be created.
         /// </summary>
-        public CreateMoment()
-          : base("CreateMoment", "CreateMoment",
-            "Creates a moment from effects",
-            "Cinnamon", "2_Build")
+        public SavedObjectOrders()
+          : base("SavedObjectOrders", "SavedObjectOrders",
+            "Loads saved cameras from the document",
+            "Cinnamon", "0B_Obj-Rec")
         {
         }
 
@@ -29,9 +30,8 @@ namespace Cinnamon.Components.Create
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("Effects", "Effects", "", GH_ParamAccess.list);
-            pManager.AddTextParameter("Style", "Style", "", GH_ParamAccess.item, "Linear");
-            pManager.AddGenericParameter("TimeRange", "TimeRange", "", GH_ParamAccess.item);
+            pManager.AddTextParameter("ObjectId", "ObjectId", "", GH_ParamAccess.item);
+            pManager.AddBooleanParameter("Reset","Reset","",GH_ParamAccess.item, false);
         }
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace Cinnamon.Components.Create
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddGenericParameter("Moment", "Moment", "", GH_ParamAccess.item);
+            pManager.AddIntegerParameter("Orders", "Orders", "", GH_ParamAccess.list);
         }
 
         /// <summary>
@@ -49,22 +49,15 @@ namespace Cinnamon.Components.Create
         /// to store data in output parameters.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            List<IEffect> effects = new List<IEffect>();
-            string curve = String.Empty;
-            TimelineTime range = TimelineTime.Empty; 
+            this.Message = "";
+            string objectId = "";
+            Guid objectIdGuid;
+            if(!DA.GetData(0, ref objectId)) { return; }
+            if(!Guid.TryParse(objectId, out objectIdGuid)) { return; }
 
-            if (!DA.GetDataList<IEffect>(0, effects)) { return; }
-            if (!DA.GetData<string>(1, ref curve)){ }
-            if (!DA.GetData<TimelineTime>(2, ref range)){ return;  }
+            if (!Document_OrderManagers.ContainsOrder(objectIdGuid)) { this.Message = "Could not find orders for that object."; return; }
 
-            if(effects.Count == 0) { return; }
-
-            AnimationCurve c = AnimationCurve.Linear;
-            if (!string.IsNullOrEmpty(curve)) { AnimationCurve.TryParse(curve, out c); }
-
-            var mom = new Moment(range, c, effects);
-
-            DA.SetData(0, mom);
+            DA.SetDataList(0, Document_OrderManagers.GetOrCreateOrderManager(objectIdGuid).Orders);
         }
 
         /// <summary>
@@ -73,13 +66,13 @@ namespace Cinnamon.Components.Create
         /// You can add image files to your project resources and access them like this:
         /// return Resources.IconForThisComponent;
         /// </summary>
-        protected override System.Drawing.Bitmap Icon => Properties.Resources.moment;
+        protected override System.Drawing.Bitmap Icon => Properties.Resources.list_02;
 
         /// <summary>
         /// Each component must have a unique Guid to identify it. 
         /// It is vital this Guid doesn't change otherwise old ghx files 
         /// that use the old ID will partially fail during loading.
         /// </summary>
-        public override Guid ComponentGuid => new Guid("FA72DA7D-A788-4EC3-BB73-1A3435148C61");
+        public override Guid ComponentGuid => new Guid("C655BA31-752A-4FE5-896F-1D8D8B1A153C");
     }
-} 
+}

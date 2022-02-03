@@ -1,4 +1,5 @@
-﻿using Cinnamon.Models;
+﻿using Cinnamon.Components.Object_Rec;
+using Cinnamon.Models;
 using Rhino.DocObjects;
 using Rhino.Geometry;
 using System;
@@ -55,9 +56,33 @@ namespace Cinnamon
 
         public void RenderCameraState(CameraState state)
         {
-            RhinoAppMappings.ActiveViewport.SetCameraLocation(state.PositionState, false);
-            RhinoAppMappings.ActiveViewport.SetCameraTarget(state.PositionState, false);
-            RhinoAppMappings.ActiveViewport.Camera35mmLensLength = state.FocalLengthState;
+            //RhinoAppMappings.ActiveViewport.SetCameraLocation(state.PositionState, false);
+            //RhinoAppMappings.ActiveViewport.SetCameraTarget(state.TargetPositionState, false);
+            if (!double.IsNaN(state.FocalLengthState))
+            {
+                RhinoAppMappings.ActiveViewport.Camera35mmLensLength = state.FocalLengthState;
+            }
+            if(state.PositionState != Point3d.Unset && state.TargetPositionState != Point3d.Unset)
+            {
+                RhinoAppMappings.ActiveViewport.SetCameraLocations(state.TargetPositionState, state.PositionState);
+            }
+            else if(state.PositionState == Point3d.Unset && state.TargetPositionState != Point3d.Unset)
+            {
+                RhinoAppMappings.ActiveViewport.SetCameraTarget(state.TargetPositionState, false);
+            }
+            else if(state.PositionState != Point3d.Unset && state.TargetPositionState == Point3d.Unset)
+            {
+                RhinoAppMappings.ActiveViewport.SetCameraLocation(state.PositionState, false);
+            }
+        }
+
+        public void RenderObjectState(ObjectState state)
+        {
+            var rhObj = state.Id.ToDocumentObject();
+            var vec = state.PositionState - rhObj.ToBBPoint();
+            //rhObj.Geometry.Translate(vec); 
+            //RhinoDoc.ActiveDoc.Objects.Transform(state.Id, Transform.Translation(vec), true);
+            Rhino.RhinoDoc.ActiveDoc.Objects.Transform(rhObj.Id, Transform.Translation(vec), true);
         }
 
         /// <summary>
@@ -69,18 +94,8 @@ namespace Cinnamon
         public void RenderState(FrameState curState, FrameState prevState)
         {
             // Camera
-            if (curState.HasCameraPositionData)
-            {
-                RhinoAppMappings.ActiveViewport.SetCameraLocation(curState.CameraState.PositionState, true);
-            }
-            if (curState.HasCameraTargetData)
-            {
-                RhinoAppMappings.ActiveViewport.SetCameraTarget(curState.CameraState.PositionState, true);
-            }
-            if (curState.CameraState.FocalLengthState > 0)
-            {
-                RhinoAppMappings.ActiveViewport.Camera35mmLensLength = curState.CameraState.FocalLengthState;
-            }
+
+            RenderCameraState(curState.CameraState);
 
             if (curState.HasLayerStates)
             {
@@ -105,7 +120,8 @@ namespace Cinnamon
                     {
                         Point3d start = prevState.ObjectPositionStates[objectInMotion];
                         Point3d end = curState.ObjectPositionStates[objectInMotion];
-                        ro.Geometry.Translate(start.VectorTo(end));
+                        //ro.Geometry.Translate(start.VectorTo(end));
+                        Rhino.RhinoDoc.ActiveDoc.Objects.Transform(objectInMotion, Transform.Translation(start.VectorTo(end)), true);
                     }
                 }
             }

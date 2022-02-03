@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Cinnamon.Models.Effects
 {
@@ -14,23 +16,39 @@ namespace Cinnamon.Models.Effects
         private Guid _id = Guid.NewGuid();
 
 
-        public double StartingFocalLength { get; private set; }
-        public double EndingFocalLength { get; private set; }
+        public List<double> FocalLengthStates { get; private set; } = new List<double>();
 
         public FocalLengthEffect(double startingFocalLength, double endingFocalLegnth)
         {
-            StartingFocalLength = startingFocalLength; 
-            EndingFocalLength = endingFocalLegnth; 
+            FocalLengthStates.Add(startingFocalLength);
+            FocalLengthStates.Add(endingFocalLegnth);
+            // Create range
+        }
+
+        public FocalLengthEffect(IEnumerable<double> states)
+        {
+            FocalLengthStates = states.Select(s => s).ToList();
         }
 
         public IEffect Copy()
         {
-            return new FocalLengthEffect(StartingFocalLength, EndingFocalLength);
+            return new FocalLengthEffect(FocalLengthStates);
         }
 
         public void SetFrameStateValue(double percentage, FrameState state)
         {
-            state.CameraState.FocalLengthState = percentage.PercToValue(StartingFocalLength, EndingFocalLength);
+            if(FocalLengthStates.Count == 2)
+            {
+                state.CameraState.FocalLengthState = percentage.PercToValue(FocalLengthStates[0], FocalLengthStates[1]);
+            }
+            else
+            {
+                var mapped = percentage / (1.0 / (FocalLengthStates.Count - 1));
+                int lower = Math.Floor(mapped).ToInt32();
+                int upper = lower + 1;
+                mapped -= lower;
+                state.CameraState.FocalLengthState = mapped.PercToValue(FocalLengthStates[lower], FocalLengthStates[upper]);
+            }
         }
     }
 }

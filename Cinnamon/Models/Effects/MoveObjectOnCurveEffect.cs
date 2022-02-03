@@ -35,7 +35,16 @@ namespace Cinnamon.Models.Effects
 
         Point3d GetValue(double percentage)
         {
-            return Curve.PointAt(percentage);
+            if(Curve is PolylineCurve pc)
+            {
+                var plc = pc.ToPolyline();
+                var mapped = percentage / (1.0 / (plc.Count - 1));
+                int lower = Math.Floor(mapped).ToInt32();
+                int upper = lower + 1;
+                mapped -= lower;
+                return mapped.PercToValue(plc[lower], plc[upper]);
+            }
+            return Curve.PointAtNormalizedLength(percentage);
         }
 
         public void SetFrameStateValue(double percentage, FrameState state)
