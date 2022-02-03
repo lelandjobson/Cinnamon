@@ -31,8 +31,8 @@ namespace Cinnamon.Components.Object_Rec
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddTextParameter("ObjectId", "ObjectId", "", GH_ParamAccess.item);
-            pManager.AddIntegerParameter("Order", "Order", "", GH_ParamAccess.item);
+            pManager.AddTextParameter("ObjectId", "ObjectId", "The id of the object which was captured", GH_ParamAccess.item);
+            pManager.AddIntegerParameter("Order", "Order", "The number of the order to preview", GH_ParamAccess.item);
         }
 
 

@@ -9,7 +9,7 @@ using System.Collections.Generic;
 namespace Cinnamon.Components.Object_Rec
 {
 
-    public class SaveObjectOrder : GH_Component
+    public class SaveObjectState : GH_Component
     {
         /// <summary>
         /// Each implementation of GH_Component must provide a public 
@@ -18,8 +18,8 @@ namespace Cinnamon.Components.Object_Rec
         /// Subcategory the panel. If you use non-existing tab or panel names, 
         /// new tabs/panels will automatically be created.
         /// </summary>
-        public SaveObjectOrder()
-          : base("SaveObjectOrder", "SaveObjectOrder",
+        public SaveObjectState()
+          : base("SaveObjectState", "SaveObjectState",
             "Captures the current object location and saves it to an order.",
             "Cinnamon", "0B_Obj-Rec")
         {
@@ -30,9 +30,9 @@ namespace Cinnamon.Components.Object_Rec
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddTextParameter("ObjectId", "ObjectId", "", GH_ParamAccess.item);
-            pManager.AddIntegerParameter("Order", "Order", "", GH_ParamAccess.item, 0);
-            pManager.AddBooleanParameter("Save", "Save", "", GH_ParamAccess.item, false);
+            pManager.AddTextParameter("ObjectId", "ObjectId", "The id of the object which you want to capture", GH_ParamAccess.item);
+            pManager.AddIntegerParameter("Order", "Order", "The order which to save the state data", GH_ParamAccess.item, 0);
+            pManager.AddBooleanParameter("Save", "Save", "Plug in a button and to save!", GH_ParamAccess.item, false);
         }
 
         /// <summary>

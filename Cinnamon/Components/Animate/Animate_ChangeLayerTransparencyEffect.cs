@@ -21,7 +21,7 @@
 //        public Animate_ChangeLayerTransparencyEffect()
 //          : base("ChangeLayerTransparency", "ChangeLayerTransparency",
 //            "Changes the transparency of the materials on objects on layers",
-//            "Cinnamon", "1_Effects")
+//            "Cinnamon", "1_Animate")
 //        {
 //        }
 
@@ -58,31 +58,12 @@
 //            double end = 0;
 
 //            if (!DA.GetDataList(0, layerNames)) { return; }
-//            if(!DA.GetData(1, ref start)) { return; }
-//            if(!DA.GetData(2, ref end)) { return; }
+//            if (!DA.GetData(1, ref start)) { return; }
+//            if (!DA.GetData(2, ref end)) { return; }
 
 //            var transEffect = new LayerFadeEffect(layerNames, start, end);
 
 //            DA.SetData(0, transEffect);
-
-
-//            //if(!DA.GetDataList(1, layerStates)) { return; }
-
-//            // LJ
-//            // TODO
-//            // Consider warnings system which passes through
-
-//            // effects setting.
-//            //List<string> warnings = new List<string>();
-
-//            //if(warnings.Count > 0)
-//            //{
-//            //    this.Message = String.Join("\n", warnings);
-//            //}
-//            //else
-//            //{
-//            //    this.Message = String.Empty;
-//            //}
 //        }
 
 //        /// <summary>
@@ -91,7 +72,7 @@
 //        /// You can add image files to your project resources and access them like this:
 //        /// return Resources.IconForThisComponent;
 //        /// </summary>
-//        protected override System.Drawing.Bitmap Icon => Properties.Resources.eff_01; 
+//        protected override System.Drawing.Bitmap Icon => Properties.Resources.eff_01;
 
 //        /// <summary>
 //        /// Each component must have a unique Guid to identify it. 
@@ -100,4 +81,4 @@
 //        /// </summary>
 //        public override Guid ComponentGuid => new Guid("FB22DAAA-B288-4EC3-BB73-1A3435148C61");
 //    }
-//} 
+//}

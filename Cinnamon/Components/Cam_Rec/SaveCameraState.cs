@@ -9,7 +9,7 @@ using System.Collections.Generic;
 namespace Cinnamon.Components.CameraTools
 {
 
-    public class SaveCameraLocation : GH_Component
+    public class SaveCameraState : GH_Component
     {
         /// <summary>
         /// Each implementation of GH_Component must provide a public 
@@ -18,9 +18,9 @@ namespace Cinnamon.Components.CameraTools
         /// Subcategory the panel. If you use non-existing tab or panel names, 
         /// new tabs/panels will automatically be created.
         /// </summary>
-        public SaveCameraLocation()
-          : base("SaveCameraLocation", "SaveCameraLocation",
-            "Captures the current camera location and saves it to an order.",
+        public SaveCameraState()
+          : base("SaveCameraState", "SaveCameraState",
+            "Captures the current camera state and saves it to an order.",
             "Cinnamon", "0A_Cam-Rec")
         {
         }
@@ -30,8 +30,8 @@ namespace Cinnamon.Components.CameraTools
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddIntegerParameter("Order", "Order", "", GH_ParamAccess.item,0);
-            pManager.AddBooleanParameter("Save", "Save", "", GH_ParamAccess.item, false);
+            pManager.AddIntegerParameter("Order", "Order", "The order which to save the state data", GH_ParamAccess.item,0);
+            pManager.AddBooleanParameter("Save", "Save", "Plug in a button and to save!", GH_ParamAccess.item, false);
         }
 
         /// <summary>

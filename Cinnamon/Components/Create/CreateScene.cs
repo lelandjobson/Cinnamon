@@ -28,8 +28,10 @@ namespace Cinnamon.Components.Create
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddTextParameter("Name", "Name", "", GH_ParamAccess.item);
-            pManager.AddGenericParameter("Moments", "Moments", "", GH_ParamAccess.list);
+            pManager.AddTextParameter("Name", "Name", "The name of the scene", GH_ParamAccess.item, "New Scene");
+            pManager.AddGenericParameter("Moments", "Moments", "The moments which occur in this scene.", GH_ParamAccess.list);
+
+            pManager[0].Optional = true;
         }
 
         /// <summary>
@@ -47,12 +49,16 @@ namespace Cinnamon.Components.Create
         /// to store data in output parameters.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
+            this.Message = "";
+
             List<Moment> moments = new List<Moment>();
             string name = "New Scene";
             if (!DA.GetData<string>(0, ref name)) { name = "New Scene"; }
             if (!DA.GetDataList<Moment>(1, moments)) { return; }
 
             var scene = new Scene(name, moments);
+
+            this.Message = $"{scene.Range.Duration} second scene starting at {scene.Range.Start} and ending at {scene.Range.End}";
 
             DA.SetData(0, scene);
         }

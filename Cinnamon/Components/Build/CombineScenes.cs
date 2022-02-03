@@ -29,11 +29,12 @@ namespace Cinnamon.Components.Create
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("Scenes", "Scenes", "", GH_ParamAccess.list);
-            pManager.AddIntegerParameter("CompilationStrategy", "CompStrat", "", GH_ParamAccess.item, 1);
-
+            pManager.AddGenericParameter("Scenes", "Scenes", "Scenes to combine into a larger scene", GH_ParamAccess.list);
+            pManager.AddIntegerParameter("CompilationStrategy", "CompStrat", "The strategy of compilation. By default puts the scenes into a sequence one after the other.", GH_ParamAccess.item, 0);
+            pManager.AddNumberParameter("Gap", "Gap", "Gap of time between scenes (only works if the compilate strategy is Sequence)", GH_ParamAccess.item, 3);
             var p = pManager[1] as Param_Integer;
             p.AddNamedValuesForEnum(typeof(SceneCompilationStrategy));
+            pManager[2].Optional= true;
         }
 
         /// <summary>
@@ -53,14 +54,16 @@ namespace Cinnamon.Components.Create
         {
             List<Scene> scenes = new List<Scene>();
             int compilationStrategy = 1;
+            double gap = 0;
             if (!DA.GetDataList<Scene>(0, scenes)) { return; }
-            DA.GetData<int>(1, ref compilationStrategy);
+            DA.GetData(1, ref compilationStrategy);
+            DA.GetData(2, ref gap);
 
             // Default is sequence
             SceneCompilationStrategy strat = SceneCompilationStrategy.Sequence;
             strat = (SceneCompilationStrategy)compilationStrategy;
 
-            var scene = Scene.Compile(scenes,strat);
+            var scene = Scene.Compile(scenes,strat, gap);
 
             DA.SetData(0, scene);
         }

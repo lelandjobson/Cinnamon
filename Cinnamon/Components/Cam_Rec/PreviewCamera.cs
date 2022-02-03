@@ -32,7 +32,7 @@ namespace Cinnamon.Components.CameraTools
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddIntegerParameter("Order", "Order", "", GH_ParamAccess.item);
+            pManager.AddIntegerParameter("Order", "Order", "The number of the order to preview", GH_ParamAccess.item);
         }
 
 

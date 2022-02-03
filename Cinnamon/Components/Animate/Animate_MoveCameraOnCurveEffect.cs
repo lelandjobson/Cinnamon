@@ -29,8 +29,8 @@ namespace Cinnamon.Components.Create
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddCurveParameter("LocationCurve", "Loc", "", GH_ParamAccess.item);
-            pManager.AddCurveParameter("TargetCurve", "Tar", "", GH_ParamAccess.item);
+            pManager.AddCurveParameter("LocationCurve", "Loc", "Curve guiding the movement of the cameras location", GH_ParamAccess.item);
+            pManager.AddCurveParameter("TargetCurve", "Tar", "Curve guiding the movement of the cameras target", GH_ParamAccess.item);
         }
 
         /// <summary>

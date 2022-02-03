@@ -4,6 +4,8 @@ using Grasshopper.Kernel;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 
 namespace Cinnamon.Components.Create
 {
@@ -28,9 +30,9 @@ namespace Cinnamon.Components.Create
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("Scenes", "Scenes", "", GH_ParamAccess.list);
-            pManager.AddIntegerParameter("Fps", "Fps", "", GH_ParamAccess.item, 30); // be wary of defaults
-            pManager.AddBooleanParameter("Reset", "Reset", "", GH_ParamAccess.item, false);
+            pManager.AddGenericParameter("Scenes", "Scenes", "Scenes which are in this movie", GH_ParamAccess.list);
+            pManager.AddIntegerParameter("Fps", "Fps", "Framerate (frames per second)", GH_ParamAccess.item, 30); // be wary of defaults
+            //pManager.AddBooleanParameter("Reset", "Reset", "Clears caching. Hit this if something looking wrong..", GH_ParamAccess.item, false);
         }
 
         /// <summary>
@@ -38,9 +40,14 @@ namespace Cinnamon.Components.Create
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddGenericParameter("Movie", "Movie", "", GH_ParamAccess.item);
-            pManager.AddIntegerParameter("FrameCount", "FrameCount", "", GH_ParamAccess.item);
+            pManager.AddGenericParameter("Movie", "Movie", "The compiled movie.", GH_ParamAccess.item);
+            pManager.AddIntegerParameter("FrameCount", "FrameCount", 
+                "The total number of frames in the movie. " +
+                "If you want to connect an int slider to scan individual frames rather than a 0-1 decimal slider, " +
+                "you can use this count to inform how big the slider should be.", GH_ParamAccess.item);
         }
+
+        private static Stopwatch _sw = new Stopwatch();
 
         /// <summary>
         /// This is the method that actually does the work.
@@ -49,22 +56,21 @@ namespace Cinnamon.Components.Create
         /// to store data in output parameters.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
+            this.Message = "";
+
             List<Scene> scenes = new List<Scene>();
             int fps = -1;
-            bool reset = false;
+            //bool reset = false;
 
             if (!DA.GetDataList<Scene>(0, scenes)) { return; }
             if(!DA.GetData<int>(1, ref fps)) { return; }
-            if (!DA.GetData<bool>(2, ref reset)) { return; }
+            //if (!DA.GetData<bool>(2, ref reset)) { return; }
 
-            
-
-            if (reset)
-            {
-
-            }
-
+            _sw.Reset(); _sw.Start();
             var m = new Movie(scenes, fps);
+            _sw.Stop();
+
+            this.Message = $"Generated {m.FrameCount} frames from {m.Scenes.Count} scenes with {m.Scenes.Sum(s => s.GetMoments().Sum(mo => mo.GetEffects().Count()))} effects in {_sw.Elapsed.TotalSeconds} seconds";
 
             DA.SetData(0, m);
             DA.SetData(1, m.FrameCount);

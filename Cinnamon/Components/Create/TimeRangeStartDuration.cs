@@ -28,8 +28,8 @@ namespace Cinnamon.Components.Create
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddNumberParameter("Start", "S", "", GH_ParamAccess.item);
-            pManager.AddNumberParameter("Duration", "D", "", GH_ParamAccess.item);
+            pManager.AddNumberParameter("Start", "S", "The start time in seconds", GH_ParamAccess.item, 0);
+            pManager.AddNumberParameter("Duration", "D", "The duration in seconds", GH_ParamAccess.item, 3);
         }
 
         /// <summary>

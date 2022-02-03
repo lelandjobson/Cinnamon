@@ -30,8 +30,8 @@ namespace Cinnamon.Components.Object_Rec
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddTextParameter("ObjectId", "ObjectId", "", GH_ParamAccess.item);
-            pManager.AddBooleanParameter("Reset","Reset","",GH_ParamAccess.item, false);
+            pManager.AddTextParameter("ObjectId", "ObjectId", "The id of the object which was captured", GH_ParamAccess.item);
+            pManager.AddBooleanParameter("Reset", "Reset", "Recalculates. Have this plugged into your capture button.", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace Cinnamon.Components.Object_Rec
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddIntegerParameter("Orders", "Orders", "", GH_ParamAccess.list);
+            pManager.AddIntegerParameter("Orders", "Orders", "Orders found in the document", GH_ParamAccess.list);
         }
 
         /// <summary>

@@ -22,6 +22,46 @@ namespace Cinnamon.Models.Effects
 
         public bool IsValid => _layers != null && _layers.Count > 0 && _states != null && _states.Count > 0;
 
+        public int LayersShownCount
+        {
+            get
+            {
+                int shown = 0;
+                for(int i = 0; i < _layers.Count; i++)
+                {
+                    if (_states[i % _states.Count])
+                    {
+                        shown++;
+                    }
+                }
+                return shown;
+            }
+        }
+
+        public int LayersHiddenCount
+        {
+            get
+            {
+                int hidden = 0;
+                for (int i = 0; i < _layers.Count; i++)
+                {
+                    if (!_states[i % _states.Count])
+                    {
+                        hidden++;
+                    }
+                }
+                return hidden;
+            }
+        }
+
+
+        public LayerShowHideEffect(List<string> layers, bool state)
+        {
+            _layers = layers;
+            _states = new List<bool>();
+            foreach(var l in _layers) { _states.Add(state); }
+        }
+
         public LayerShowHideEffect(List<string> layers, List<bool> states)
         {
             _layers = layers;
@@ -37,19 +77,21 @@ namespace Cinnamon.Models.Effects
         {
             if (!IsValid) { return; }
 
-            // Get layers
-            int i = 0;
-            foreach (var n in _layers)
+            state.FrameActions.Add((s) =>
             {
-                bool cur = _states[i % _states.Count];
-                var l = RhinoAppMappings.DocumentLayers.FindName(n);
-                if (l == null || l == default(Layer))
+                // Get layers
+                int i = 0;
+                foreach (var n in _layers)
                 {
-                    continue;
+                    bool cur = _states[i % _states.Count];
+                    var l = RhinoAppMappings.DocumentLayers.FindName(n);
+                    if (l != null && l != default(Layer))
+                    {
+                        l.IsVisible = cur;
+                    }
+                    i++;
                 }
-                l.IsVisible = cur;
-                i++;
-            }
+            });
         }
     }
 }

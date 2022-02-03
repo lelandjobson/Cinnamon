@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace Cinnamon.Components.Create
 {
-    public class Animate_ChangeLensLengthEffect : GH_Component
+    public class Animate_ChangeFocalLengthEffect : GH_Component
     {
         /// <summary>
         /// Each implementation of GH_Component must provide a public 
@@ -17,8 +17,8 @@ namespace Cinnamon.Components.Create
         /// Subcategory the panel. If you use non-existing tab or panel names, 
         /// new tabs/panels will automatically be created.
         /// </summary>
-        public Animate_ChangeLensLengthEffect()
-          : base("ChangeLensLength", "ChangeLensLength",
+        public Animate_ChangeFocalLengthEffect()
+          : base("ChangeFocalLength", "ChangeFocalLength",
             "Changes the lens length of the camera over time",
             "Cinnamon", "1_Animate")
         {
@@ -29,8 +29,8 @@ namespace Cinnamon.Components.Create
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddNumberParameter("Start", "Start", "", GH_ParamAccess.item);
-            pManager.AddNumberParameter("End", "End", "", GH_ParamAccess.item);
+            pManager.AddNumberParameter("Start", "Start", "Starting focal length", GH_ParamAccess.item);
+            pManager.AddNumberParameter("End", "End", "Ending focal length", GH_ParamAccess.item);
         }
 
         /// <summary>

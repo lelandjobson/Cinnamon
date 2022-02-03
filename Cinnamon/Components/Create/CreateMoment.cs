@@ -30,9 +30,9 @@ namespace Cinnamon.Components.Create
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("Effects", "Effects", "", GH_ParamAccess.list);
-            pManager.AddIntegerParameter("Style", "Style", "", GH_ParamAccess.item, 0);
-            pManager.AddGenericParameter("TimeRange", "TimeRange", "", GH_ParamAccess.item);
+            pManager.AddGenericParameter("Effects", "Effects", "Effects which will run at this moment", GH_ParamAccess.list);
+            pManager.AddIntegerParameter("Style", "Style", "The style of effect interpolation. EaseInOut by default.", GH_ParamAccess.item, 3);
+            pManager.AddGenericParameter("TimeRange", "TimeRange", "The range of time where this effect will be run in the timeline", GH_ParamAccess.item);
 
             pManager[0].Optional = true;
             pManager[0].DataMapping = GH_DataMapping.Flatten;
@@ -55,6 +55,8 @@ namespace Cinnamon.Components.Create
         /// to store data in output parameters.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
+            this.Message = "";
+
             List<IEffect> effects = new List<IEffect>();
             int curve = 0;
             TimelineTime range = TimelineTime.Empty;
@@ -70,6 +72,8 @@ namespace Cinnamon.Components.Create
             c = (AnimationCurve)curve;
 
             var mom = new Moment(range, c, effects);
+
+            this.Message = $"{mom.Time.Duration} second moment starting at {mom.Time.Start}.";
 
             DA.SetData(0, mom);
         }

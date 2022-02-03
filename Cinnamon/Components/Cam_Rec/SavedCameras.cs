@@ -32,7 +32,7 @@ namespace Cinnamon.Components.CameraTools
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddBooleanParameter("Reset", "Reset", "", GH_ParamAccess.item,false);
+            pManager.AddBooleanParameter("Reset", "Reset", "Recalculates. Have this plugged into your capture button.", GH_ParamAccess.item, false);
 
             OrderManager.OrderChanged += OrderManager_OrderChanged;
         }

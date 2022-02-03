@@ -41,7 +41,7 @@ namespace Cinnamon.Models
 
         private FrameState[] __frames;
 
-        public Movie(List<Scene> scenes, int fps, int loops = 1)
+        public Movie(List<Scene> scenes, int fps, int loops = 1, bool generateFrameState = true)
         {
             Fps = fps;
             Scenes = scenes ?? this.Scenes;
@@ -54,6 +54,10 @@ namespace Cinnamon.Models
                 (Scenes == null || Scenes.Count == 0) ?
                 0 :
                 System.Convert.ToInt32(Math.Ceiling(this.Duration.End * Fps));
+            if (generateFrameState)
+            {
+                GenerateFrameState();
+            }
         }
 
         public void ExpireFrameState() => __frames = null;
