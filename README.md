@@ -1,6 +1,8 @@
 # Cinnamon
 
-Good for your health!
+Its called that because it sounds like cinema. Also - good for digestion!
+
+![Cinnamon in action](/Images/Cinnamon.gif)
 
 ## Introduction
 
