@@ -48,6 +48,7 @@ namespace Cinnamon.Components.CameraTools
         /// to store data in output parameters.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
+            this.Message = "WARNING! \n In case of state changes, \n  Use a COPY of your model file, \n not the original.";
             int order = -1;
             bool run = false;
             DA.GetData(0, ref order);

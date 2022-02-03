@@ -33,6 +33,9 @@ namespace Cinnamon.Components.Create
             pManager.AddGenericParameter("Scenes", "Scenes", "Scenes which are in this movie", GH_ParamAccess.list);
             pManager.AddIntegerParameter("Fps", "Fps", "Framerate (frames per second)", GH_ParamAccess.item, 30); // be wary of defaults
             //pManager.AddBooleanParameter("Reset", "Reset", "Clears caching. Hit this if something looking wrong..", GH_ParamAccess.item, false);
+            pManager.AddNumberParameter("EndPause", "EndPause", "The amount of time at the end to hold the final frame.", GH_ParamAccess.item, 2);
+
+            pManager[2].Optional = true;
         }
 
         /// <summary>
@@ -60,17 +63,28 @@ namespace Cinnamon.Components.Create
 
             List<Scene> scenes = new List<Scene>();
             int fps = -1;
+            double endPause = 0;
             //bool reset = false;
 
             if (!DA.GetDataList<Scene>(0, scenes)) { return; }
             if(!DA.GetData<int>(1, ref fps)) { return; }
+            DA.GetData(2, ref endPause);
             //if (!DA.GetData<bool>(2, ref reset)) { return; }
+
+            if(scenes.Count == 0) { return; }
+
+            if(!double.IsNaN(endPause) && endPause != 0 && endPause > 0)
+            {
+                // get the end of the last scene
+                double end = scenes.Max(s => s.Range.End);
+                scenes.Add(Scene.Empty(end, endPause));
+            }
 
             _sw.Reset(); _sw.Start();
             var m = new Movie(scenes, fps);
             _sw.Stop();
 
-            this.Message = $"Generated {m.FrameCount} frames from {m.Scenes.Count} scenes with {m.Scenes.Sum(s => s.GetMoments().Sum(mo => mo.GetEffects().Count()))} effects in {_sw.Elapsed.TotalSeconds} seconds";
+            this.Message = $"Generated {m.FrameCount} frames \n from {m.Scenes.Count} scenes \n with {m.Scenes.Sum(s => s.GetMoments().Sum(mo => mo.GetEffects().Count()))} effects \n in {_sw.Elapsed.TotalSeconds} seconds";
 
             DA.SetData(0, m);
             DA.SetData(1, m.FrameCount);

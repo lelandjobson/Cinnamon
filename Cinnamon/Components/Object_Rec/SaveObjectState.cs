@@ -49,6 +49,7 @@ namespace Cinnamon.Components.Object_Rec
         /// to store data in output parameters.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
+            this.Message = "WARNING! \n In case of state changes, \n  Use a COPY of your model file, \n not the original.";
             this.Message = "";
             string id = "";
             int order = -1;

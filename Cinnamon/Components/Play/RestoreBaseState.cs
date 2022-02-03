@@ -34,7 +34,7 @@ namespace Cinnamon.Components.Create
   
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddBooleanParameter("Restore", "Restore", "", GH_ParamAccess.item, false);
+            pManager.AddBooleanParameter("Restore", "Restore", "Attach a button and click to restore.", GH_ParamAccess.item, false);
             // Save base state
             _restoreState = FrameState.CurrentDocumentState;
         }

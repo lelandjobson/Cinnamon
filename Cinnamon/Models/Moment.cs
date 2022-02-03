@@ -51,6 +51,6 @@ namespace Cinnamon.Models
                 );
         }
 
-        public static Moment Empty(double duration) => new Moment(new TimelineTime() { Start = 0, End = duration }, AnimationCurve.Linear, null);
+        public static Moment Empty(double duration, double startTime = 0) => new Moment(new TimelineTime() { Start = startTime, End = startTime + duration }, AnimationCurve.Linear, null);
     }
 }

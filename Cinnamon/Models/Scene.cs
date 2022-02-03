@@ -56,6 +56,12 @@ namespace Cinnamon.Models
             RecalcRange();
         }
 
+
+        public static Scene Empty(double startTime, double pauseTime)
+        {
+            return new Scene("Pause", new List<Moment>() { Moment.Empty(pauseTime, startTime) });
+        }
+
         public static Scene Compile(List<Scene> scenes, SceneCompilationStrategy strat, double gap = 0)
         {
             string combinedName = String.Join(" + ", scenes.Select(s => s.Name));

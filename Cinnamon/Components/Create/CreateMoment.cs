@@ -73,7 +73,7 @@ namespace Cinnamon.Components.Create
 
             var mom = new Moment(range, c, effects);
 
-            this.Message = $"{mom.Time.Duration} second moment starting at {mom.Time.Start}.";
+            this.Message = $"{mom.Time.Duration} second moment \n starting at {mom.Time.Start}.";
 
             DA.SetData(0, mom);
         }
