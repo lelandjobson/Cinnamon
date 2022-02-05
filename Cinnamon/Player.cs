@@ -1,4 +1,4 @@
-﻿using Cinnamon.Components.Object_Rec;
+﻿using Cinnamon.Components.Capture;
 using Cinnamon.Models;
 using Rhino.DocObjects;
 using Rhino.Geometry;

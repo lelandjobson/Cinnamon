@@ -1,16 +1,13 @@
-﻿using Cinnamon.Models;
+using Cinnamon.Models;
 using Grasshopper;
 using Grasshopper.Kernel;
-using Grasshopper.Kernel.Data;
-using Rhino.DocObjects.Custom;
+using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
-namespace Cinnamon.Components.Object_Rec
+namespace Cinnamon.Components.Capture
 {
-
-    public class PreviewOrder_Object : GH_Component
+    public class NextCapture : GH_Component
     {
         /// <summary>
         /// Each implementation of GH_Component must provide a public 
@@ -19,28 +16,32 @@ namespace Cinnamon.Components.Object_Rec
         /// Subcategory the panel. If you use non-existing tab or panel names, 
         /// new tabs/panels will automatically be created.
         /// </summary>
-        public PreviewOrder_Object()
-          : base("PreviewOrder", "PreviewOrder",
-            "Previews an object order from the document",
-            "Cinnamon", "0B_Obj-Rec")
+        public NextCapture()
+          : base("NextCapture", "NextCapture",
+            "Provides the next Capture",
+            "Cinnamon", "0_Capture")
         {
         }
+
+        private static int _Capture = 0;
 
         /// <summary>
         /// Registers all the input parameters for this component.
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddTextParameter("ObjectId", "ObjectId", "The id of the object which was captured", GH_ParamAccess.item);
-            pManager.AddIntegerParameter("Order", "Order", "The number of the order to preview", GH_ParamAccess.item);
-        }
+            pManager.AddTextParameter("ObjectId", "ObjectId", "Leave empty for camera captures. Otherwise the object id to retreive Captures for", GH_ParamAccess.item);
+            pManager.AddBooleanParameter("Reset", "Reset", "Recalculates. Have this plugged into your capture button.", GH_ParamAccess.item);
 
+            pManager[0].Optional = true;
+        }
 
         /// <summary>
         /// Registers all the output parameters for this component.
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
+            pManager.AddNumberParameter("NextCapture", "NextCapture", "The next unused Capture to save the capture to", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -50,23 +51,23 @@ namespace Cinnamon.Components.Object_Rec
         /// to store data in output parameters.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            this.Message = string.Empty;
+            this.Message = "";
+            string id = string.Empty;
+            DA.GetData(0, ref id);
 
-            int order = -1;
-            string id = "";
-            if(!DA.GetData(0, ref id)){ return; }
-            if(!DA.GetData(1, ref order)){ return; }
-            if(!Guid.TryParse(id, out Guid gid)) { return; }
-
-            if (!Document_OrderManagers.ContainsOrder(gid))
+            if (string.IsNullOrEmpty(id))
             {
-                this.Message = "No orders found in the document for this object";
+                // camera
+                this.Message = $"Camera: {CaptureManager_Camera.Next}";
+                DA.SetData(0, CaptureManager_Camera.Next);
                 return;
             }
-
-            var objState = Document_OrderManagers.GetOrCreateOrderManager(gid).GetOrderData(order);
-
-            Player.MainPlayer.RenderObjectState(objState);
+            if(!Guid.TryParse(id, out Guid gId)) { return; }
+            //this.Message = "Object";
+            var omg = Document_CaptureManagers.GetOrCreateCaptureManager(gId);
+            //_Capture = omg.Next;
+            this.Message = $"Object: {omg.Next}";
+            DA.SetData(0, omg.Next);
         }
 
         /// <summary>
@@ -75,13 +76,13 @@ namespace Cinnamon.Components.Object_Rec
         /// You can add image files to your project resources and access them like this:
         /// return Resources.IconForThisComponent;
         /// </summary>
-        protected override System.Drawing.Bitmap Icon => Properties.Resources.play_02;
+        protected override System.Drawing.Bitmap Icon => Properties.Resources.next_02;
 
         /// <summary>
         /// Each component must have a unique Guid to identify it. 
         /// It is vital this Guid doesn't change otherwise old ghx files 
         /// that use the old ID will partially fail during loading.
         /// </summary>
-        public override Guid ComponentGuid => new Guid("C655BA31-752A-4FE5-896F-1D8D8A4A153C");
+        public override Guid ComponentGuid => new Guid("C655BA31-752A-4FE5-AB6F-1D8D8A4A253C");
     }
 }

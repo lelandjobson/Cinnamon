@@ -6,10 +6,10 @@ using Rhino.DocObjects.Custom;
 using System;
 using System.Collections.Generic;
 
-namespace Cinnamon.Components.CameraTools
+namespace Cinnamon.Components.Capture
 {
 
-    public class SaveCameraState : GH_Component
+    public class Capture : GH_Component
     {
         /// <summary>
         /// Each implementation of GH_Component must provide a public 
@@ -18,10 +18,10 @@ namespace Cinnamon.Components.CameraTools
         /// Subcategory the panel. If you use non-existing tab or panel names, 
         /// new tabs/panels will automatically be created.
         /// </summary>
-        public SaveCameraState()
-          : base("SaveCameraState", "SaveCameraState",
-            "Captures the current camera state and saves it to an order.",
-            "Cinnamon", "0A_Cam-Rec")
+        public Capture()
+          : base("Capture", "Capture",
+            "Captures the camera or given object location and saves it to an Capture.",
+            "Cinnamon", "0_Capture")
         {
         }
 
@@ -30,8 +30,11 @@ namespace Cinnamon.Components.CameraTools
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddIntegerParameter("Order", "Order", "The order which to save the state data", GH_ParamAccess.item,0);
+            pManager.AddTextParameter("ObjectId", "ObjectId", "Leave empty to capture the camera, otherwise provide the id of the object which you want to capture", GH_ParamAccess.item);
+            pManager.AddIntegerParameter("Capture#", "Capture#", "The Capture number which to save the state data", GH_ParamAccess.item, 0);
             pManager.AddBooleanParameter("Save", "Save", "Plug in a button and to save!", GH_ParamAccess.item, false);
+
+            pManager[0].Optional = true;
         }
 
         /// <summary>
@@ -48,20 +51,47 @@ namespace Cinnamon.Components.CameraTools
         /// to store data in output parameters.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            this.Message = "WARNING! \n In case of state changes, \n  Use a COPY of your model file, \n not the original.";
-            int order = -1;
+            //this.Message = "WARNING! \n In case of state changes, \n  Use a COPY of your model file, \n not the original.";
+            this.Message = "";
+            string id = "";
+            int Capture = -1;
             bool run = false;
-            DA.GetData(0, ref order);
-            DA.GetData(1, ref run);
+            DA.GetData(0, ref id);
+            if(!DA.GetData(1, ref Capture)) { return; }
+            DA.GetData(2, ref run);
 
             if (!run) { return; }
+            if (string.IsNullOrEmpty(id))
+            {
+                // Capture the camera
+                CaptureManager_Camera.CreateNewCapture(Capture);
+                this.Message = $"Capture {Capture} Saved";
+                return;
+            }
+            if (!Guid.TryParse(id, out Guid gid)) { return; }
+            var rhobj = Rhino.RhinoDoc.ActiveDoc.Objects.FindId(gid);   
+            if(rhobj == null) {
+                this.Message = "Could not find an object with that id.";
+                return;
+            }
 
-            OrderManager.CreateNewOrder(order);
+            var bb = rhobj.Geometry?.GetBoundingBox(true) ?? null;
+            if(bb == null) {
+                this.Message = "Could not produce an Capture from this object.";
+                return; 
+            }
+
+            var objManager = Document_CaptureManagers.GetOrCreateCaptureManager(gid);
+            objManager.CreateNewCapture(Capture, bb.Value.Center);
+            this.Message = $"Capture {Capture} Saved";
+
+
+            //CaptureManager.CreateNewCapture(Capture);
             //var p = new GH_Path();
             //p.AppendElement(0);
 
             //// test if this works
-            //this.Params.Input[0].AddVolatileData(p, 0, _nextOrderUp);
+            //this.Params.Input[0].AddVolatileData(p, 0, _nextCaptureUp);
         }
 
         /// <summary>
@@ -70,13 +100,13 @@ namespace Cinnamon.Components.CameraTools
         /// You can add image files to your project resources and access them like this:
         /// return Resources.IconForThisComponent;
         /// </summary>
-        protected override System.Drawing.Bitmap Icon => Properties.Resources.rec_01;
+        protected override System.Drawing.Bitmap Icon => Properties.Resources.rec_02;
 
         /// <summary>
         /// Each component must have a unique Guid to identify it. 
         /// It is vital this Guid doesn't change otherwise old ghx files 
         /// that use the old ID will partially fail during loading.
         /// </summary>
-        public override Guid ComponentGuid => new Guid("4E2271AC-BFA2-4BF4-A8B9-7838B5F374C0");
+        public override Guid ComponentGuid => new Guid("C655BA31-752A-4FE5-896F-1D8D8A4A211A");
     }
 }

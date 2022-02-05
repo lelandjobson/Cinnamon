@@ -66,7 +66,12 @@ namespace Cinnamon.Components.Create
             if (!DA.GetData<int>(1, ref curve)){ }
             if (!DA.GetData<TimelineTime>(2, ref range)){ return;  }
 
-            if(effects.Count == 0) { return; }
+            if(effects == null || effects.Count == 0) {
+                var result = Moment.Empty(range.Duration, range.Start);
+                this.Message = $"{range.Duration} second pause \n starting at {range.Start}.";
+                DA.SetData(0, result);
+                return;
+            }
 
             AnimationCurve c = AnimationCurve.Linear;
             c = (AnimationCurve)curve;

@@ -6,22 +6,22 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Cinnamon.Components.Object_Rec
+namespace Cinnamon.Components.Capture
 {
 
-    public class OrderManager_Object
+    public class CaptureManager_Object
     {
-        public event EventHandler OrderChanged;
-        public List<int> Orders
+        public event EventHandler CaptureChanged;
+        public List<int> Captures
         {
             get
             {
-                RegenOrderData();
-                return _orders?.ToList() ?? new List<int>();
+                RegenCaptureData();
+                return _Captures?.ToList() ?? new List<int>();
             }
         }
-        private List<int> _orders;
-        private List<Layer> _orderLayers;
+        private List<int> _Captures;
+        private List<Layer> _CaptureLayers;
 
         private static LayerTable _rhlyrs => Rhino.RhinoDoc.ActiveDoc.Layers;
 
@@ -30,13 +30,13 @@ namespace Cinnamon.Components.Object_Rec
         public readonly string ObjectId;
         public readonly Guid ObjectIdGuid;
 
-        public OrderManager_Object(Guid objectId)
+        public CaptureManager_Object(Guid objectId)
         {
             ObjectIdGuid = objectId;
             ObjectId = objectId.ToString();
         }
 
-        private Layer _orderLayersParent
+        private Layer _CaptureLayersParent
         {
             get
             {
@@ -48,7 +48,7 @@ namespace Cinnamon.Components.Object_Rec
                     {
                         Name = ObjectId,
                         IsVisible = false,
-                        IsLocked = true
+                        //IsLocked = true
                     };
                     _rhlyrs.Add(p);
                     return _rhlyrs.FindName(ObjectId);
@@ -64,37 +64,37 @@ namespace Cinnamon.Components.Object_Rec
         {
             get
             {
-                RegenOrderData();
-                if(Orders.Count == 0) { return 0; }
-                return Orders.Last() + 1;
+                RegenCaptureData();
+                if(Captures.Count == 0) { return 0; }
+                return Captures.Last() + 1;
             }
         }
 
-        void RegenOrderData()
+        void RegenCaptureData()
         {
             // gather doc layers
-            _orders = null;
-            _orders = new List<int>();
-            _orderLayers = new List<Layer>();
+            _Captures = null;
+            _Captures = new List<int>();
+            _CaptureLayers = new List<Layer>();
 
-            foreach (var l in _rhlyrs.Where(l => l.ParentLayerId == _orderLayersParent.Id))
+            foreach (var l in _rhlyrs.Where(l => l.ParentLayerId == _CaptureLayersParent.Id))
             {
-                int order = -1;
-                if(!Int32.TryParse(l.Name, out order)) { continue; }
-                _orders.Add(order);
-                _orderLayers.Add(l);
+                int Capture = -1;
+                if(!Int32.TryParse(l.Name, out Capture)) { continue; }
+                _Captures.Add(Capture);
+                _CaptureLayers.Add(l);
             }
-            if(_orders.Count == 0) { _orders = null; return; }
-            _orders.Sort();
-            _orderLayers.Sort((a, b) => Int32.Parse(a.Name).CompareTo(Int32.Parse(b.Name)));
-            //OrderChanged?.Invoke(null, null);
+            if(_Captures.Count == 0) { _Captures = null; return; }
+            _Captures.Sort();
+            _CaptureLayers.Sort((a, b) => Int32.Parse(a.Name).CompareTo(Int32.Parse(b.Name)));
+            //CaptureChanged?.Invoke(null, null);
         }
 
-        internal ObjectState GetOrderData(int order)
+        internal ObjectState GetCaptureData(int Capture)
         {
-            if (!Orders.Contains(order)) { return null; }
-            int idx = Orders.IndexOf(order);
-            var objs = Rhino.RhinoDoc.ActiveDoc.Objects.FindByLayer(_orderLayers[idx]);
+            if (!Captures.Contains(Capture)) { return null; }
+            int idx = Captures.IndexOf(Capture);
+            var objs = Rhino.RhinoDoc.ActiveDoc.Objects.FindByLayer(_CaptureLayers[idx]);
             ObjectState output = new ObjectState(this.ObjectIdGuid);
             foreach(var o in objs)
             {
@@ -108,28 +108,28 @@ namespace Cinnamon.Components.Object_Rec
             return output;
         }
 
-        public void CreateNewOrder(int order, Point3d location = default(Point3d))
+        public void CreateNewCapture(int Capture, Point3d location = default(Point3d))
         {
             Layer l = null;
             int lyrIndex = -1;
-            if (Orders.Contains(order))
+            if (Captures.Contains(Capture))
             {
-                // Clear geometry from order
-                ClearOrderData(order, out l);
+                // Clear geometry from Capture
+                ClearCaptureData(Capture, out l);
                 lyrIndex = l.Index;
             }
             else
             {
-                // Create order layers
+                // Create Capture layers
                 l = new Layer() {
-                    Name = order.ToString(),
+                    Name = Capture.ToString(),
                     IsVisible = false,
-                    IsLocked = true,
-                    ParentLayerId = _orderLayersParent.Id
+                    //IsLocked = true,
+                    ParentLayerId = _CaptureLayersParent.Id
                 };
                 lyrIndex = Rhino.RhinoDoc.ActiveDoc.Layers.Add(l);
-                l.ParentLayerId = _orderLayersParent.Id;
-                RegenOrderData();
+                l.ParentLayerId = _CaptureLayersParent.Id;
+                RegenCaptureData();
             }
 
             // Create objects
@@ -142,11 +142,11 @@ namespace Cinnamon.Components.Object_Rec
             // donezo
         }
 
-        public bool ClearOrderData(int order, out Layer layer)
+        public bool ClearCaptureData(int Capture, out Layer layer)
         {
             layer = null;
-            if (!_orders.Contains(order)) { return false; }
-            layer = _orderLayers[_orders.IndexOf(order)];
+            if (!_Captures.Contains(Capture)) { return false; }
+            layer = _CaptureLayers[_Captures.IndexOf(Capture)];
             var objectsToDelete = Rhino.RhinoDoc.ActiveDoc.Objects.FindByLayer(layer);
             foreach(var o in objectsToDelete)
             {

@@ -1,5 +1,4 @@
-using Cinnamon.Components.CameraTools;
-using Cinnamon.Components.Object_Rec;
+using Cinnamon.Components.Capture;
 using Cinnamon.Models;
 using Cinnamon.Models.Effects;
 using Grasshopper;
@@ -11,7 +10,7 @@ using System.Linq;
 
 namespace Cinnamon.Components.Create
 {
-    public class AnimateOrders : GH_Component
+    public class AnimateCaptures : GH_Component
     {
         /// <summary>
         /// Each implementation of GH_Component must provide a public 
@@ -20,9 +19,9 @@ namespace Cinnamon.Components.Create
         /// Subcategory the panel. If you use non-existing tab or panel names, 
         /// new tabs/panels will automatically be created.
         /// </summary>
-        public AnimateOrders()
-          : base("AnimateOrders ", "AnimateOrders ",
-            "Creates a movement from orders",
+        public AnimateCaptures()
+          : base("AnimateCaptures ", "AnimateCaptures ",
+            "Creates a movement from Captures",
             "Cinnamon", "1_Animate")
         {
         }
@@ -33,7 +32,7 @@ namespace Cinnamon.Components.Create
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddTextParameter("ObjectId", "ObjectId", "Id of the object. If blank, uses the camera instead", GH_ParamAccess.item, string.Empty);
-            pManager.AddIntegerParameter("Orders", "Orders", "Orders to utilize in the animation.", GH_ParamAccess.list);
+            pManager.AddIntegerParameter("Captures", "Captures", "Captures to utilize in the animation.", GH_ParamAccess.list);
             pManager.AddBooleanParameter("Interpolate", "Interpolate", "If true, uses .", GH_ParamAccess.item, false);
 
             pManager[0].Optional = true;
@@ -56,13 +55,13 @@ namespace Cinnamon.Components.Create
         {
             string objectId = string.Empty;
             Guid objectIdGuid;
-            List<int> orders = new List<int>();
+            List<int> Captures = new List<int>();
             bool interp = false;
 
             DA.GetData(0, ref objectId);
-            if (!DA.GetDataList(1, orders)) { return; }
+            if (!DA.GetDataList(1, Captures)) { return; }
             DA.GetData(2, ref interp);
-            if(orders.Count == 0) { return; }
+            if(Captures.Count == 0) { return; }
 
             List<IEffect> effectsOutput = new List<IEffect>();
             if (string.IsNullOrEmpty(objectId))
@@ -70,7 +69,7 @@ namespace Cinnamon.Components.Create
                 // Camera motion effect
                 Curve loc;
                 Curve target;
-                List<CameraState> states = orders.Select(o => OrderManager.GetOrderData(o)).ToList();
+                List<CameraState> states = Captures.Select(o => CaptureManager_Camera.GetCaptureData(o)).ToList();
                 if (!interp)
                 {
                     loc = new PolylineCurve(states.Select(s => s.PositionState));
@@ -90,8 +89,8 @@ namespace Cinnamon.Components.Create
                 if (!Guid.TryParse(objectId, out objectIdGuid)) { return; }
                 // Object motion effect
                 Curve movement;
-                var omg = Document_OrderManagers.GetOrCreateOrderManager(objectIdGuid);
-                List<ObjectState> states = orders.Select(o => omg.GetOrderData(o)).ToList();
+                var omg = Document_CaptureManagers.GetOrCreateCaptureManager(objectIdGuid);
+                List<ObjectState> states = Captures.Select(o => omg.GetCaptureData(o)).ToList();
                 if (!interp)
                 {
                     movement = new PolylineCurve(states.Select(s => s.PositionState));

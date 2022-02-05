@@ -1,7 +1,7 @@
 ﻿using Rhino.Geometry;
 using System;
 
-namespace Cinnamon.Components.Object_Rec
+namespace Cinnamon.Models
 {
     public class ObjectState
     {

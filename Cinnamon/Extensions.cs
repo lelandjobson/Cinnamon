@@ -15,7 +15,7 @@ namespace Cinnamon
 
         internal static Point3d ToBBPoint(this RhinoObject ro) => ro.Geometry?.GetBoundingBox(true).Center ?? Point3d.Unset;
 
-        internal static Vector3d GetOrderTransform(this RhinoObject ro, Point3d toPoint) => toPoint - ro.ToBBPoint();
+        internal static Vector3d GetCaptureTransform(this RhinoObject ro, Point3d toPoint) => toPoint - ro.ToBBPoint();
 
         internal static int ToInt32(this double d) => System.Convert.ToInt32(d);
 

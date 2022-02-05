@@ -246,7 +246,7 @@ namespace Cinnamon.Models
 
         static double GetInterp(double input, List<double> output)
         {
-            double mult = input * 100;
+            double mult = input * 99;
             int flor = Convert.ToInt32(Math.Floor(mult));
             int ceil = Convert.ToInt32(Math.Ceiling(mult));
             if(flor == ceil) { return output[flor]; }

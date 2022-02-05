@@ -6,10 +6,10 @@ using Rhino.DocObjects.Custom;
 using System;
 using System.Collections.Generic;
 
-namespace Cinnamon.Components.Object_Rec
+namespace Cinnamon.Components.Capture
 {
 
-    public class SavedObjectOrders : GH_Component
+    public class SavedCaptures : GH_Component
     {
         /// <summary>
         /// Each implementation of GH_Component must provide a public 
@@ -18,10 +18,10 @@ namespace Cinnamon.Components.Object_Rec
         /// Subcategory the panel. If you use non-existing tab or panel names, 
         /// new tabs/panels will automatically be created.
         /// </summary>
-        public SavedObjectOrders()
-          : base("SavedObjectOrders", "SavedObjectOrders",
-            "Loads saved cameras from the document",
-            "Cinnamon", "0B_Obj-Rec")
+        public SavedCaptures()
+          : base("SavedCaptures", "SavedCaptures",
+            "Loads saved captures from the document",
+            "Cinnamon", "0_Capture")
         {
         }
 
@@ -30,8 +30,10 @@ namespace Cinnamon.Components.Object_Rec
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddTextParameter("ObjectId", "ObjectId", "The id of the object which was captured", GH_ParamAccess.item);
+            pManager.AddTextParameter("ObjectId", "ObjectId", "Leave empty to load the camera captures. Otherwise the id of the object which was captured", GH_ParamAccess.item);
             pManager.AddBooleanParameter("Reset", "Reset", "Recalculates. Have this plugged into your capture button.", GH_ParamAccess.item);
+
+            pManager[0].Optional = true;
         }
 
         /// <summary>
@@ -39,7 +41,7 @@ namespace Cinnamon.Components.Object_Rec
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddIntegerParameter("Orders", "Orders", "Orders found in the document", GH_ParamAccess.list);
+            pManager.AddIntegerParameter("Captures", "Captures", "Captures found in the document", GH_ParamAccess.list);
         }
 
         /// <summary>
@@ -52,12 +54,20 @@ namespace Cinnamon.Components.Object_Rec
             this.Message = "";
             string objectId = "";
             Guid objectIdGuid;
-            if(!DA.GetData(0, ref objectId)) { return; }
-            if(!Guid.TryParse(objectId, out objectIdGuid)) { return; }
+            DA.GetData(0, ref objectId);
+            if (string.IsNullOrEmpty(objectId))
+            {
+                // Camera
+                this.Message = "Camera";
+                DA.SetDataList(0, CaptureManager_Camera.Captures);
+                return;
+            }
+            if (!Guid.TryParse(objectId, out objectIdGuid)) { return; }
 
-            if (!Document_OrderManagers.ContainsOrder(objectIdGuid)) { this.Message = "Could not find orders for that object."; return; }
+            if (!Document_CaptureManagers.ContainsCapture(objectIdGuid)) { this.Message = "Could not find Captures \n for that object."; return; }
 
-            DA.SetDataList(0, Document_OrderManagers.GetOrCreateOrderManager(objectIdGuid).Orders);
+            this.Message = "Object";
+            DA.SetDataList(0, Document_CaptureManagers.GetOrCreateCaptureManager(objectIdGuid).Captures);
         }
 
         /// <summary>

@@ -8,3 +8,4 @@ C:\Users\Leland\Documents\GitHub\Cinnamon\Cinnamon\obj\Debug\net48\Cinnamon.cspr
 C:\Users\Leland\Documents\GitHub\Cinnamon\Cinnamon\obj\Debug\net48\Cinnamon.gha
 C:\Users\Leland\Documents\GitHub\Cinnamon\Cinnamon\obj\Debug\net48\Cinnamon.pdb
 C:\Users\Leland\Documents\GitHub\Cinnamon\Cinnamon\bin\Debug\net48\Cinnamon.pdb
+C:\Users\Leland\Documents\GitHub\Cinnamon\Cinnamon\obj\Debug\net48\Cinnamon.csproj.AssemblyReference.cache

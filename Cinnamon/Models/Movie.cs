@@ -101,7 +101,7 @@ namespace Cinnamon.Models
                         {
                             if (_frames[i] == null) { _frames[i] = new FrameState(this, i); }
                             FrameState frameState = _frames[i];
-                            double effectPerc = AnimationCurveExtensions.GetNormalizedValue(m.Curve, i.Remap(frameStart, frameEnd, 0, 1));
+                            double effectPerc = AnimationCurveExtensions.GetNormalizedValue(m.Curve, i.Remap(frameStart, frameEnd - 1, 0, 1));
                             foreach (var e in m.GetEffects())
                             {
                                 e.SetFrameStateValue(effectPerc, frameState);
@@ -154,7 +154,7 @@ namespace Cinnamon.Models
                     new List<Moment>() {
                         new Moment(
                             new TimelineTime() { Start = 0, End = duration },
-                            AnimationCurve.Linear,
+                            AnimationCurve.EaseInOut,
                             new List<IEffect>() { effect })
                     })
                 }, frameRate);
