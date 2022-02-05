@@ -2,6 +2,8 @@
 
 Its called that because it sounds like cinema. Also - good for digestion!
 
+For FULL Documentation, visit the notion @ https://lelandjobson.notion.site/Cinnamon-For-GH-007ac9c5bafc42559f3fd7d456c6bd43
+
 ![Cinnamon in action](/Images/Cinnamon.gif)
 
 ## Introduction
@@ -24,10 +26,5 @@ Setting up Cinnamon
 Setting Up your Document
 
 - Remember, Cinnamon directly changes the state of objects in the document: Work within a copy of your Rhino model which will serve as your “stage” model.
-- See the example file in the release (.3dm & .gh files)
+- See the example files in the release (.3dm & .gh files)
 
-Known limitations
-
-- Issues with Linear movement reaching the final keyframe
-- Object movement does not change object orientation
-- Uses active viewport
