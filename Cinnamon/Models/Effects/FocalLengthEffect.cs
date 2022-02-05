@@ -45,6 +45,7 @@ namespace Cinnamon.Models.Effects
             {
                 var mapped = percentage / (1.0 / (FocalLengthStates.Count - 1));
                 int lower = Math.Floor(mapped).ToInt32();
+                if(lower == FocalLengthStates.Count - 1) { lower--; }
                 int upper = lower + 1;
                 mapped -= lower;
                 state.CameraState.FocalLengthState = mapped.PercToValue(FocalLengthStates[lower], FocalLengthStates[upper]);

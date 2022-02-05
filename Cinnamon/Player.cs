@@ -20,15 +20,21 @@ namespace Cinnamon
 
         private FrameState _previousState = FrameState.BaseState;
 
+        bool _isNewMovie = true;
+
         public Movie Movie
         {
             get => _movie;
             set
             {
-                _movie = value; 
+                if(_movie == value) { return; }
+                _movie = value;
+                _isNewMovie = true;
             }
         }
         private Movie _movie;
+
+        private int _previousFrame = -1;
 
 
         private static Dictionary<Guid, RhinoObject> _docObjects => __docObjects ?? (__docObjects = Rhino.RhinoDoc.ActiveDoc.Objects.GetObjectList(Rhino.DocObjects.ObjectType.AnyObject).ToDictionary(o => o.Id, o => o));
@@ -44,9 +50,29 @@ namespace Cinnamon
             __docObjects = null;
         }
 
-        public void ScanFrame(int frame)
+        public void ScanFrame(int frame, bool backTracking = false)
         {
-            if(_movie == null) { return; }
+            if(_movie == null || frame < 0) { return; }
+
+            if(!backTracking)
+            {
+                if (_previousFrame > frame)
+                {
+                    // Rewind
+                    for (int i = _previousFrame - 1; i > frame; i--)
+                    {
+                        ScanFrame(i, true);
+                    }
+                }
+                else if (_previousFrame < frame)
+                {
+                    // Forward
+                    for (int i = _previousFrame + 1; i < frame; i++)
+                    {
+                        ScanFrame(i, true);
+                    }
+                }
+            }
             FrameState fs = default(FrameState);
             switch (PlayStyle)
             {
@@ -57,6 +83,8 @@ namespace Cinnamon
                     throw new Exception("Not implemented yet!");
             }
             RenderState(fs,_previousState);
+
+            if (!backTracking) { _previousFrame = frame; }            
         }
 
         public void RenderCameraState(CameraState state)

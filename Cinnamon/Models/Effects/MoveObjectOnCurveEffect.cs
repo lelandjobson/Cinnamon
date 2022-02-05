@@ -41,6 +41,11 @@ namespace Cinnamon.Models.Effects
                 var mapped = percentage / (1.0 / (plc.Count - 1));
                 int lower = Math.Floor(mapped).ToInt32();
                 int upper = lower + 1;
+                // safeguard
+                if (upper >= plc.Count)
+                {
+                    return plc.Last;
+                }
                 mapped -= lower;
                 return mapped.PercToValue(plc[lower], plc[upper]);
             }

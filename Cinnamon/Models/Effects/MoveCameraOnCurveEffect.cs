@@ -41,6 +41,11 @@ namespace Cinnamon.Models.Effects
                 int lower = Math.Floor(mapped).ToInt32();
                 int upper = lower + 1;
                 mapped -= lower;
+                // safeguard
+                if(upper >= plc.Count)
+                {
+                    return plc.Last;
+                }
                 return mapped.PercToValue(plc[lower], plc[upper]);
             }
             return curve.PointAtNormalizedLength(percentage);

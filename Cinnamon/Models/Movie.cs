@@ -11,8 +11,10 @@ namespace Cinnamon.Models
     /// <summary>
     /// A compiled movie with effects
     /// </summary>
-    public class Movie
+    public class Movie : IEquatable<Movie>
     {
+        public readonly Guid Id = Guid.NewGuid();
+
         public bool IsReady { get; private set; } = false;
         public bool IsProcessingFrames { get; private set; } = false;
 
@@ -158,6 +160,16 @@ namespace Cinnamon.Models
                             new List<IEffect>() { effect })
                     })
                 }, frameRate);
+        }
+
+        public bool Equals(Movie other)
+        {
+            return this.Id == other.Id;
+        }
+
+        public override int GetHashCode()
+        {
+            return Id.ToString().GetHashCode();
         }
     }
 }
