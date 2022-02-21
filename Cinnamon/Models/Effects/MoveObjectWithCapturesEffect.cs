@@ -8,7 +8,7 @@ namespace Cinnamon.Models.Effects
     /// Moves an object.
     /// </summary>
     [Serializable]
-    public class MoveObjectOnCurveEffect : IEffect
+    public class MoveObjectWithCapturesEffect : IEffect
     {
         public string Name { get; set; }
 
@@ -22,9 +22,7 @@ namespace Cinnamon.Models.Effects
 
         public Curve Curve { get; private set; }
 
-        public Vector3d AdjustmentVector { get; private set; }
-
-        public MoveObjectOnCurveEffect(Guid objectId, Curve curve)
+        public MoveObjectWithCapturesEffect(Guid objectId, Curve curve)
         {
             if (!curve.IsValid) { throw new Exception("Could not create effect with invalid curve."); }
 
@@ -34,12 +32,6 @@ namespace Cinnamon.Models.Effects
             // set curve startpoint to criitical point location
             var ro = objectId.ToDocumentObject();
             if(ro == null) { throw new Exception("Provided Id is invalid or does not refer to an object in the document"); }
-            var cp = ro.GetCriticalPoint();
-            AdjustmentVector = new Vector3d(
-               cp.X - Curve.PointAtStart.X,
-               cp.Y - Curve.PointAtStart.Y ,
-                cp.Z-  Curve.PointAtStart.Z);
-
         }
 
         public IEffect Copy()
@@ -71,7 +63,6 @@ namespace Cinnamon.Models.Effects
             {
                 result = Curve.PointAtNormalizedLength(percentage);
             }
-            result.Transform(Transform.Translation(AdjustmentVector));
             return result;
         }
 

@@ -70,6 +70,7 @@ namespace Cinnamon.Components.Create
                 Curve loc;
                 Curve target;
                 List<CameraState> states = Captures.Select(o => CaptureManager_Camera.GetCaptureData(o)).ToList();
+                if(states.Count < 2) { throw new Exception("2 or more captures are required to produce an effect."); }
                 if (!interp)
                 {
                     loc = new PolylineCurve(states.Select(s => s.PositionState));
@@ -91,6 +92,7 @@ namespace Cinnamon.Components.Create
                 Curve movement;
                 var omg = Document_CaptureManagers.GetOrCreateCaptureManager(objectIdGuid);
                 List<ObjectState> states = Captures.Select(o => omg.GetCaptureData(o)).ToList();
+                if (states.Count < 2) { throw new Exception("2 or more captures are required to produce an effect."); }
                 if (!interp)
                 {
                     movement = new PolylineCurve(states.Select(s => s.PositionState));
@@ -99,7 +101,7 @@ namespace Cinnamon.Components.Create
                 {
                     movement = Curve.CreateInterpolatedCurve(states.Select(s => s.PositionState), 3);
                 }
-                effectsOutput.Add(new MoveObjectOnCurveEffect(objectIdGuid, movement));
+                effectsOutput.Add(new MoveObjectWithCapturesEffect(objectIdGuid, movement));
             }
 
             DA.SetDataList(0, effectsOutput);

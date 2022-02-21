@@ -15,18 +15,20 @@ namespace Cinnamon
         {
             if(ro is ClippingPlaneObject co)
             {
-                return co.Geometry.GetBoundingBox(true).Center;
+                return co.ToBBPoint();
             }
             else if(ro.Geometry is Point p) { return p.Location; }
             else if (ro.Geometry != null)
             {
-                return ro.Geometry.GetBoundingBox(true).Center;
+                return ro.ToBBPoint();
             }
             else
             {
                 throw new Exception("provided element has no geometry");
             }
         }
+
+        internal static Point3d ToBBPoint(this ClippingPlaneObject co) => co.Geometry?.GetBoundingBox(true).Center ?? Point3d.Unset;
 
         internal static RhinoObject ToDocumentObject(this Guid id) => Rhino.RhinoDoc.ActiveDoc.Objects.Find(id);
 

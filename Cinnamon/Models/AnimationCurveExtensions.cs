@@ -108,10 +108,9 @@ namespace Cinnamon.Models
             0.925935,
             0.963194,
             1,
-
         };
 
-        static List<double> _easeOut => __easeOut ?? (__easeOut = _easeOut.OrderBy(c => -c - 1).ToList());
+        static List<double> _easeOut => __easeOut ?? (__easeOut = _easeIn.OrderBy(c => -c).ToList());
         static List<double> __easeOut;
 
         static List<double> _easeInOut = new List<double>()
@@ -244,13 +243,13 @@ namespace Cinnamon.Models
             return ((max - min) * GetNormalizedValue(curve, value)) + min;
         }
 
-        static double GetInterp(double input, List<double> output)
+        static double GetInterp(double input, List<double> outputRange)
         {
-            double mult = input * 99;
+            double mult = input * (outputRange.Count - 1);
             int flor = Convert.ToInt32(Math.Floor(mult));
             int ceil = Convert.ToInt32(Math.Ceiling(mult));
-            if(flor == ceil) { return output[flor]; }
-            return ((output[ceil] - output[flor]) * input) + output[flor];
+            if(flor == ceil) { return outputRange[flor]; }
+            return ((outputRange[ceil] - outputRange[flor]) * input) + outputRange[flor];
         }
     }
 }
