@@ -75,14 +75,8 @@ namespace Cinnamon.Components.Capture
                 return;
             }
 
-            var bb = rhobj.Geometry?.GetBoundingBox(true) ?? null;
-            if(bb == null) {
-                this.Message = "Could not produce an Capture from this object.";
-                return; 
-            }
-
             var objManager = Document_CaptureManagers.GetOrCreateCaptureManager(gid);
-            objManager.CreateNewCapture(Capture, bb.Value.Center);
+            objManager.CreateNewCapture(Capture,rhobj.GetCriticalPoint());
             this.Message = $"Capture {Capture} Saved";
 
 

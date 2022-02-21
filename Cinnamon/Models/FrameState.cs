@@ -27,16 +27,16 @@ namespace Cinnamon.Models
 
         public List<Action<FrameState>> FrameActions = new List<Action<FrameState>>();
 
-        public Dictionary<Guid, Point3d> ObjectPositionStates
+        public Dictionary<Guid, ObjectState> ObjectPositionStates
         {
             get
             {
-                if(_objectPositionStates == null) { _objectPositionStates = new Dictionary<Guid,Point3d>(); }
+                if(_objectPositionStates == null) { _objectPositionStates = new Dictionary<Guid, ObjectState>(); }
                 HasObjectsAnimating = true;
                 return _objectPositionStates;
             }
         }
-        private Dictionary<Guid, Point3d> _objectPositionStates;
+        private Dictionary<Guid, ObjectState> _objectPositionStates;
 
         public bool HasLayerStates = false;
 
@@ -102,7 +102,7 @@ namespace Cinnamon.Models
 
                 _objectPositionStates = Rhino.RhinoDoc.ActiveDoc.Objects
                     .GetObjectList(Rhino.DocObjects.ObjectType.AnyObject)
-                    .ToDictionary(o => o.Id, o => Point3d.Origin),
+                    .ToDictionary(o => o.Id, o => new ObjectState(o.Id, Point3d.Unset)),
                 CameraState = new CameraState()
                 {
                     PositionState = RhinoAppMappings.ActiveView.ActiveViewport.CameraLocation,
