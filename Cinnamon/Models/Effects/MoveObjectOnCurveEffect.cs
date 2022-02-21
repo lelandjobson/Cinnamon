@@ -22,10 +22,21 @@ namespace Cinnamon.Models.Effects
 
         public Curve Curve { get; private set; }
 
+        public Vector3d AdjustmentVector { get; private set; }
+
         public MoveObjectOnCurveEffect(Guid objectId, Curve curve)
         {
             ObjectId = objectId;
             Curve = curve;
+            // set curve startpoint to criitical point location
+            var ro = objectId.ToDocumentObject();
+            if(ro == null) { throw new Exception("Provided Id is invalid or does not refer to an object in the document"); }
+            var cp = ro.GetCriticalPoint();
+            AdjustmentVector = new Vector3d(
+               cp.X - Curve.PointAtStart.X,
+               cp.Y - Curve.PointAtStart.Y ,
+                cp.Z-  Curve.PointAtStart.Z);
+
         }
 
         public IEffect Copy()
@@ -35,6 +46,7 @@ namespace Cinnamon.Models.Effects
 
         Point3d GetValue(double percentage)
         {
+            Point3d result = default(Point3d);
             if(Curve is PolylineCurve pc)
             {
                 var plc = pc.ToPolyline();
@@ -47,9 +59,14 @@ namespace Cinnamon.Models.Effects
                     return plc.Last;
                 }
                 mapped -= lower;
-                return mapped.PercToValue(plc[lower], plc[upper]);
+                result = mapped.PercToValue(plc[lower], plc[upper]);
             }
-            return Curve.PointAtNormalizedLength(percentage);
+            else
+            {
+                result = Curve.PointAtNormalizedLength(percentage);
+            }
+            result.Transform(Transform.Translation(AdjustmentVector));
+            return result;
         }
 
         public void SetFrameStateValue(double percentage, FrameState state)
@@ -57,14 +74,14 @@ namespace Cinnamon.Models.Effects
             var loc = GetValue(percentage);
             if (!state.ObjectPositionStates.ContainsKey(ObjectId))
             {
-                state.ObjectPositionStates.Add(ObjectId, loc);
+                state.ObjectPositionStates.Add(ObjectId, new ObjectState(ObjectId, loc));
             }
             else
             {
                 Logger.Log(
                     $"Object location being overrided by effect \"{Name}\"");
 
-                state.ObjectPositionStates[ObjectId] = loc;
+                state.ObjectPositionStates[ObjectId] = new ObjectState(ObjectId, loc);
             }
         }
     }

@@ -149,19 +149,20 @@ namespace Cinnamon
             }
 
             // Animating Objects
-            if (curState.HasObjectsAnimating && prevState != null)
+            if (curState.HasObjectsAnimating)
             {
                 foreach(var objectInMotion in curState.ObjectPositionStates.Keys)
                 {
-                    // Move object to location
-                    if (_docObjects.TryGetValue(objectInMotion, out var ro) &&
-                        prevState.ObjectPositionStates.ContainsKey(objectInMotion))
-                    {
-                        Point3d start = prevState.ObjectPositionStates[objectInMotion];
-                        Point3d end = curState.ObjectPositionStates[objectInMotion];
-                        //ro.Geometry.Translate(start.VectorTo(end));
-                        Rhino.RhinoDoc.ActiveDoc.Objects.Transform(objectInMotion, Transform.Translation(start.VectorTo(end)), true);
-                    }
+                    RenderObjectState(curState.ObjectPositionStates[objectInMotion]);
+                    //// Move object to location
+                    //if (_docObjects.TryGetValue(objectInMotion, out var ro))
+                    //{
+                    //    Rhino.RhinoDoc.ActiveDoc.Objects.Transform(
+                    //        objectInMotion, 
+                    //        Transform.Translation(
+                    //            objectInMotion.ToDocumentObject().GetCriticalPoint().VectorTo(curState.ObjectPositionStates[objectInMotion])), true);
+
+                    //}
                 }
             }
 

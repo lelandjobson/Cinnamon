@@ -11,6 +11,23 @@ namespace Cinnamon
 {
     internal static class Extensions
     {
+        internal static Point3d GetCriticalPoint(this RhinoObject ro)
+        {
+            if(ro is ClippingPlaneObject co)
+            {
+                return co.Geometry.GetBoundingBox(true).Center;
+            }
+            else if(ro.Geometry is Point p) { return p.Location; }
+            else if (ro.Geometry != null)
+            {
+                return ro.Geometry.GetBoundingBox(true).Center;
+            }
+            else
+            {
+                throw new Exception("provided element has no geometry");
+            }
+        }
+
         internal static RhinoObject ToDocumentObject(this Guid id) => Rhino.RhinoDoc.ActiveDoc.Objects.Find(id);
 
         internal static Point3d ToBBPoint(this RhinoObject ro) => ro.Geometry?.GetBoundingBox(true).Center ?? Point3d.Unset;
