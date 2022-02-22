@@ -3,6 +3,8 @@ using Cinnamon.Models;
 using Cinnamon.Models.Effects;
 using Grasshopper;
 using Grasshopper.Kernel;
+using Grasshopper.Kernel.Types;
+using Rhino.DocObjects;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
@@ -31,7 +33,7 @@ namespace Cinnamon.Components.Create
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddTextParameter("ObjectId", "ObjectId", "Id of the object. If blank, uses the camera instead", GH_ParamAccess.item, string.Empty);
+            pManager.AddGenericParameter("Object", "Object", "The object. If blank, uses the camera instead.", GH_ParamAccess.item);
             pManager.AddIntegerParameter("Captures", "Captures", "Captures to utilize in the animation.", GH_ParamAccess.list);
             pManager.AddBooleanParameter("Interpolate", "Interpolate", "If true, uses .", GH_ParamAccess.item, false);
 
@@ -53,12 +55,35 @@ namespace Cinnamon.Components.Create
         /// to store data in output parameters.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            string objectId = string.Empty;
             Guid objectIdGuid;
             List<int> Captures = new List<int>();
             bool interp = false;
 
-            DA.GetData(0, ref objectId);
+            #region Handle ObjectId / Object Overloading
+            object theObject = null;
+            DA.GetData(0, ref theObject);
+            string objectId = string.Empty;
+            if(theObject != null)
+            {
+                if (theObject is string st)
+                {
+                    objectId = st;
+                }
+                else if (theObject is GH_Guid id)
+                {
+                    objectId = id.Value.ToString();
+                }
+                else if (theObject is RhinoObject ro)
+                {
+                    objectId = ro.Id.ToString();
+                }
+                else
+                {
+                    throw new Exception($"Unhandled type {theObject.GetType()}");
+                }
+            }
+            #endregion
+
             if (!DA.GetDataList(1, Captures)) { return; }
             DA.GetData(2, ref interp);
             if(Captures.Count == 0) { return; }

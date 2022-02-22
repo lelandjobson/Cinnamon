@@ -1,7 +1,9 @@
 ﻿using Cinnamon.Models;
+using GH_IO.Types;
 using Grasshopper;
 using Grasshopper.Kernel;
 using Grasshopper.Kernel.Data;
+using Grasshopper.Kernel.Types;
 using Rhino.DocObjects.Custom;
 using System;
 using System.Collections.Generic;
@@ -31,7 +33,7 @@ namespace Cinnamon.Components.Capture
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddTextParameter("ObjectId", "ObjectId", "Leave empty to preview camera. Otheriwise the id of the object which was captured", GH_ParamAccess.item);
+            pManager.AddGenericParameter("Object", "Object", "The object. If blank, uses the camera instead.", GH_ParamAccess.item);
             pManager.AddIntegerParameter("Capture", "Capture", "The number of the Capture to preview", GH_ParamAccess.item);
 
             pManager[0].Optional = true;
@@ -55,17 +57,39 @@ namespace Cinnamon.Components.Capture
             this.Message = string.Empty;
 
             int Capture = -1;
-            string id = "";
-            DA.GetData(0, ref id);
+            #region Handle ObjectId / Object Overloading
+            object theObject = null;
+            DA.GetData(0, ref theObject);
+            string objectId = string.Empty;
+            if (theObject != null)
+            {
+                if (theObject is string st)
+                {
+                    objectId = st;
+                }
+                else if (theObject is GH_Guid id)
+                {
+                    objectId = id.Value.ToString();
+                }
+                else if (theObject is Rhino.DocObjects.RhinoObject ro)
+                {
+                    objectId = ro.Id.ToString();
+                }
+                else
+                {
+                    throw new Exception($"Unhandled type {theObject.GetType()}");
+                }
+            }
+            #endregion
             if (!DA.GetData(1, ref Capture)){ return; }
-            if (string.IsNullOrEmpty(id))
+            if (string.IsNullOrEmpty(objectId))
             {
                 // camera
                 Player.MainPlayer.RenderCameraState(CaptureManager_Camera.GetCaptureData(Capture));
                 this.Message = "Rendering Camera";
                 return;
             }
-            if(!Guid.TryParse(id, out Guid gid)) { return; }
+            if(!Guid.TryParse(objectId, out Guid gid)) { return; }
 
             if (!Document_CaptureManagers.ContainsCapture(gid))
             {

@@ -2,6 +2,8 @@
 using Grasshopper;
 using Grasshopper.Kernel;
 using Grasshopper.Kernel.Data;
+using Grasshopper.Kernel.Types;
+using Rhino.DocObjects;
 using Rhino.DocObjects.Custom;
 using System;
 using System.Collections.Generic;
@@ -30,7 +32,7 @@ namespace Cinnamon.Components.Capture
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddTextParameter("ObjectId", "ObjectId", "Leave empty to capture the camera, otherwise provide the id of the object which you want to capture", GH_ParamAccess.item);
+            pManager.AddGenericParameter("Object", "Object", "The object. If blank, uses the camera instead.", GH_ParamAccess.item);
             pManager.AddIntegerParameter("Capture#", "Capture#", "The Capture number which to save the state data", GH_ParamAccess.item, 0);
             pManager.AddBooleanParameter("Save", "Save", "Plug in a button and to save!", GH_ParamAccess.item, false);
 
@@ -53,22 +55,46 @@ namespace Cinnamon.Components.Capture
         {
             //this.Message = "WARNING! \n In case of state changes, \n  Use a COPY of your model file, \n not the original.";
             this.Message = "";
-            string id = "";
             int Capture = -1;
             bool run = false;
-            DA.GetData(0, ref id);
-            if(!DA.GetData(1, ref Capture)) { return; }
+
+            #region Handle ObjectId / Object Overloading
+            object theObject = null;
+            DA.GetData(0, ref theObject);
+            string objectId = string.Empty;
+            if (theObject != null)
+            {
+                if (theObject is string st)
+                {
+                    objectId = st;
+                }
+                else if (theObject is GH_Guid id)
+                {
+                    objectId = id.Value.ToString();
+                }
+                else if (theObject is Rhino.DocObjects.RhinoObject ro)
+                {
+                    objectId = ro.Id.ToString();
+                }
+                else
+                {
+                    throw new Exception($"Unhandled type {theObject.GetType()}");
+                }
+            }
+            #endregion
+
+            if (!DA.GetData(1, ref Capture)) { return; }
             DA.GetData(2, ref run);
 
             if (!run) { return; }
-            if (string.IsNullOrEmpty(id))
+            if (string.IsNullOrEmpty(objectId))
             {
                 // Capture the camera
                 CaptureManager_Camera.CreateNewCapture(Capture);
                 this.Message = $"Capture {Capture} Saved";
                 return;
             }
-            if (!Guid.TryParse(id, out Guid gid)) { return; }
+            if (!Guid.TryParse(objectId, out Guid gid)) { return; }
             var rhobj = Rhino.RhinoDoc.ActiveDoc.Objects.FindId(gid);   
             if(rhobj == null) {
                 this.Message = "Could not find an object with that id.";
