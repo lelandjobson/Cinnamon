@@ -2,6 +2,8 @@ using Cinnamon.Models;
 using Cinnamon.Models.Effects;
 using Grasshopper;
 using Grasshopper.Kernel;
+using Grasshopper.Kernel.Types;
+using Rhino.DocObjects;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
@@ -29,7 +31,7 @@ namespace Cinnamon.Components.Create
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddTextParameter("ObjectId", "ObjectId", "The Guid of the object to move.", GH_ParamAccess.item);
+            pManager.AddGenericParameter("Object", "Object", "The object.", GH_ParamAccess.item);
             pManager.AddCurveParameter("LocationCurve", "Loc", "The curve which will guide its location.", GH_ParamAccess.item);
         }
 
@@ -48,12 +50,35 @@ namespace Cinnamon.Components.Create
         /// to store data in output parameters.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            string oid = string.Empty;
-            Guid oidGuid;
+            #region Handle ObjectId / Object Overloading
+            object theObject = null;
+            DA.GetData(0, ref theObject);
+            string objectId = string.Empty;
+            if (theObject != null)
+            {
+                if (theObject is string st)
+                {
+                    objectId = st;
+                }
+                else if (theObject is GH_Guid id)
+                {
+                    objectId = id.Value.ToString();
+                }
+                else if (theObject is RhinoObject ro)
+                {
+                    objectId = ro.Id.ToString();
+                }
+                else
+                {
+                    throw new Exception($"Unhandled type {theObject.GetType()}");
+                }
+            }
+            #endregion
+
+
             Curve cur = null;
             if (!DA.GetData<Curve>(1, ref cur)){ return; }
-            if(!DA.GetData(0, ref oid)) { return; }
-            if(!Guid.TryParse(oid, out oidGuid)) { return; }
+            if(!Guid.TryParse(objectId, out var oidGuid)) { return; }
 
 
             var eff = new MoveObjectOnCurveEffect(oidGuid, cur);

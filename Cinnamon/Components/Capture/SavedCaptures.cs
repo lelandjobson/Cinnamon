@@ -2,6 +2,7 @@
 using Grasshopper;
 using Grasshopper.Kernel;
 using Grasshopper.Kernel.Data;
+using Grasshopper.Kernel.Types;
 using Rhino.DocObjects.Custom;
 using System;
 using System.Collections.Generic;
@@ -30,7 +31,7 @@ namespace Cinnamon.Components.Capture
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddTextParameter("ObjectId", "ObjectId", "Leave empty to load the camera captures. Otherwise the id of the object which was captured", GH_ParamAccess.item);
+            pManager.AddGenericParameter("Object", "Object", "The object. If blank, uses the camera instead.", GH_ParamAccess.item);
             pManager.AddBooleanParameter("Reset", "Reset", "Recalculates. Have this plugged into your capture button.", GH_ParamAccess.item);
 
             pManager[0].Optional = true;
@@ -52,9 +53,30 @@ namespace Cinnamon.Components.Capture
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             this.Message = "";
-            string objectId = "";
-            Guid objectIdGuid;
-            DA.GetData(0, ref objectId);
+            #region Handle ObjectId / Object Overloading
+            object theObject = null;
+            DA.GetData(0, ref theObject);
+            string objectId = string.Empty;
+            if (theObject != null)
+            {
+                if (theObject is string st)
+                {
+                    objectId = st;
+                }
+                else if (theObject is GH_Guid id)
+                {
+                    objectId = id.Value.ToString();
+                }
+                else if (theObject is Rhino.DocObjects.RhinoObject ro)
+                {
+                    objectId = ro.Id.ToString();
+                }
+                else
+                {
+                    throw new Exception($"Unhandled type {theObject.GetType()}");
+                }
+            }
+            #endregion
             if (string.IsNullOrEmpty(objectId))
             {
                 // Camera
@@ -62,12 +84,11 @@ namespace Cinnamon.Components.Capture
                 DA.SetDataList(0, CaptureManager_Camera.Captures);
                 return;
             }
-            if (!Guid.TryParse(objectId, out objectIdGuid)) { return; }
+            if (!Guid.TryParse(objectId, out var objectIdGuid)) { return; }
 
-            if (!Document_CaptureManagers.ContainsCapture(objectIdGuid)) { this.Message = "Could not find Captures \n for that object."; return; }
-
+            //if (!Document_CaptureManagers.ContainsCapture(objectIdGuid)) { this.Message = "Could not find Captures \n for that object."; return; }
             this.Message = "Object";
-            DA.SetDataList(0, Document_CaptureManagers.GetOrCreateCaptureManager(objectIdGuid).Captures);
+            DA.SetDataList(0, Document_CaptureManagers.GetOrCreateCaptureManager(objectIdGuid).Captures ?? new List<int>());
         }
 
         /// <summary>

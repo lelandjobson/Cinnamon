@@ -1,6 +1,7 @@
 using Cinnamon.Models;
 using Grasshopper;
 using Grasshopper.Kernel;
+using Grasshopper.Kernel.Types;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
@@ -30,7 +31,7 @@ namespace Cinnamon.Components.Capture
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddTextParameter("ObjectId", "ObjectId", "Leave empty for camera captures. Otherwise the object id to retreive Captures for", GH_ParamAccess.item);
+            pManager.AddGenericParameter("Object", "Object", "The object. If blank, uses the camera instead.", GH_ParamAccess.item);
             pManager.AddBooleanParameter("Reset", "Reset", "Recalculates. Have this plugged into your capture button.", GH_ParamAccess.item);
 
             pManager[0].Optional = true;
@@ -52,17 +53,39 @@ namespace Cinnamon.Components.Capture
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             this.Message = "";
-            string id = string.Empty;
-            DA.GetData(0, ref id);
+            #region Handle ObjectId / Object Overloading
+            object theObject = null;
+            DA.GetData(0, ref theObject);
+            string objectId = string.Empty;
+            if (theObject != null)
+            {
+                if (theObject is string st)
+                {
+                    objectId = st;
+                }
+                else if (theObject is GH_Guid id)
+                {
+                    objectId = id.Value.ToString();
+                }
+                else if (theObject is Rhino.DocObjects.RhinoObject ro)
+                {
+                    objectId = ro.Id.ToString();
+                }
+                else
+                {
+                    throw new Exception($"Unhandled type {theObject.GetType()}");
+                }
+            }
+            #endregion
 
-            if (string.IsNullOrEmpty(id))
+            if (string.IsNullOrEmpty(objectId))
             {
                 // camera
                 this.Message = $"Camera: {CaptureManager_Camera.Next}";
                 DA.SetData(0, CaptureManager_Camera.Next);
                 return;
             }
-            if(!Guid.TryParse(id, out Guid gId)) { return; }
+            if(!Guid.TryParse(objectId, out Guid gId)) { return; }
             //this.Message = "Object";
             var omg = Document_CaptureManagers.GetOrCreateCaptureManager(gId);
             //_Capture = omg.Next;
