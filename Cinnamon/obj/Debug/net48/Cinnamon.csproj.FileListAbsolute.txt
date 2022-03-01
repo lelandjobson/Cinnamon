@@ -1,4 +1,5 @@
 C:\Users\Leland\Documents\GitHub\Cinnamon\Cinnamon\bin\Debug\net48\Cinnamon.gha
+C:\Users\Leland\Documents\GitHub\Cinnamon\Cinnamon\bin\Debug\net48\Cinnamon.pdb
 C:\Users\Leland\Documents\GitHub\Cinnamon\Cinnamon\obj\Debug\net48\Cinnamon.Properties.Resources.resources
 C:\Users\Leland\Documents\GitHub\Cinnamon\Cinnamon\obj\Debug\net48\Cinnamon.csproj.GenerateResource.cache
 C:\Users\Leland\Documents\GitHub\Cinnamon\Cinnamon\obj\Debug\net48\Cinnamon.GeneratedMSBuildEditorConfig.editorconfig
@@ -7,4 +8,3 @@ C:\Users\Leland\Documents\GitHub\Cinnamon\Cinnamon\obj\Debug\net48\Cinnamon.Asse
 C:\Users\Leland\Documents\GitHub\Cinnamon\Cinnamon\obj\Debug\net48\Cinnamon.csproj.CoreCompileInputs.cache
 C:\Users\Leland\Documents\GitHub\Cinnamon\Cinnamon\obj\Debug\net48\Cinnamon.gha
 C:\Users\Leland\Documents\GitHub\Cinnamon\Cinnamon\obj\Debug\net48\Cinnamon.pdb
-C:\Users\Leland\Documents\GitHub\Cinnamon\Cinnamon\bin\Debug\net48\Cinnamon.pdb

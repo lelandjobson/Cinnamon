@@ -169,5 +169,7 @@ namespace Cinnamon.Components.Capture
             return true;
         }
 
+        public static void DeleteLayer(Layer l) => Rhino.RhinoDoc.ActiveDoc.Layers.Delete(l);
+
     }
 }

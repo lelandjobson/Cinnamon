@@ -155,5 +155,7 @@ namespace Cinnamon.Components.Capture
             return true;
         }
 
+        public void DeleteLayer(Layer layer) => Rhino.RhinoDoc.ActiveDoc.Layers.Delete(layer);
+
     }
 }
