@@ -17,8 +17,13 @@ namespace Cinnamon.Models
 
         public double FocalLengthState = -1;
 
-        public CameraState(Guid id, params Point3d[] points) : base(id, points)
+        public CameraState(params Point3d[] points) : base(Guid.Empty, points)
         {
+        }
+
+        public override void Apply()
+        {
+            throw new NotImplementedException();
         }
     }
 }

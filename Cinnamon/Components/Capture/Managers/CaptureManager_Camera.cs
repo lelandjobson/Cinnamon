@@ -115,7 +115,7 @@ namespace Cinnamon.Components.Capture
             if (!Captures.Contains(order)) { return null; }
             int idx = Captures.IndexOf(order);
             var objs = Rhino.RhinoDoc.ActiveDoc.Objects.FindByLayer(_orderLayers[idx]);
-            CameraState output = new CameraState(RhinoAppMappings.ActiveViewport.Id);
+            CameraState output = new CameraState();
             foreach(var o in objs)
             {
                 if (o.Name.Contains(POINTNAME_CAMERALOCATION))

@@ -123,8 +123,8 @@ namespace Cinnamon.Components.Capture
             {
                 if (o.Name.Contains(POINTNAME_LOCATION))
                 {
-                    double focalLength = RhinoAppMappings.ActiveViewport.Camera35mmLensLength;
-                    double.TryParse(o.Name.Split('_').Last(), out focalLength);
+                    //double focalLength = RhinoAppMappings.ActiveViewport.Camera35mmLensLength;
+                    //double.TryParse(o.Name.Split('_').Last(), out focalLength);
                     output.PositionState = (o.Geometry as Point).Location;
                 }
             }

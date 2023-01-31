@@ -36,7 +36,7 @@ namespace Cinnamon.Models
                 _objectPositionStates = Rhino.RhinoDoc.ActiveDoc.Objects
                     .GetObjectList(Rhino.DocObjects.ObjectType.AnyObject)
                     .ToDictionary(o => o.Id, o => o.TryGetOrientationState(out var state) ? state : new SinglePointObjectOrientationState(o.Id, Point3d.Unset)),
-                CameraState = new CameraState(DocumentBaseState.ActiveBase.ViewportId)
+                CameraState = new CameraState()
                 {
                     PositionState = RhinoAppMappings.ActiveView.ActiveViewport.CameraLocation,
                     TargetPositionState = RhinoAppMappings.ActiveView.ActiveViewport.CameraTarget,
@@ -46,7 +46,7 @@ namespace Cinnamon.Models
 
         #region State data
 
-        public CameraState CameraState { get; set; }
+        public CameraState CameraState { get; set; } = new CameraState();
 
         public List<Action<FrameState>> FrameActions = new List<Action<FrameState>>();
 

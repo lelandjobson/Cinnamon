@@ -114,7 +114,7 @@ namespace Cinnamon
 
         public void RenderObjectState(ObjectOrientationState state)
         {
-            state.Apply();
+            state?.Apply();
 
             //if(state.Kind == OrientationStateKind.ThreePoint)
             //{
@@ -122,10 +122,7 @@ namespace Cinnamon
             //}
             //else
             //{
-            //    // Single point orientation
-            //    var rhObj = state.Id.ToDocumentObject();
-            //    var vec = state.A - rhObj.ToBBPoint();
-            //    Rhino.RhinoDoc.ActiveDoc.Objects.Transform(rhObj.Id, Transform.Translation(vec), true);
+ 
             //}
         }
 
