@@ -1,184 +1,54 @@
-﻿using Cinnamon.Models;
+﻿using Cinnamon.Components.Capture.Managers;
+using Cinnamon.Models;
 using Rhino.DocObjects;
-using Rhino.DocObjects.Tables;
-using Rhino.Geometry;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Cinnamon.Components.Capture
 {
-    public class CaptureManager_Object
+    public class CaptureManager_Object : CaptureManager<ObjectOrientationState>
     {
-        public List<int> Captures
-        {
-            get
-            {
-                RegenCaptureData();
-                return _Captures?.ToList() ?? new List<int>();
-            }
-        }
-        private List<int> _Captures;
-        private List<Layer> _CaptureLayers;
+        public readonly Guid Id;
 
-        private static LayerTable _rhlyrs => Rhino.RhinoDoc.ActiveDoc.Layers;
-
-        public const string POINTNAME_LOCATION = "objloc";
-
-        public readonly string ObjectId;
-        public readonly Guid ObjectIdGuid;
-
-        public CaptureManager_Object(Guid objectId)
-        {
-            ObjectIdGuid = objectId;
-            ObjectId = objectId.ToString();
-        }
-
-        private static Layer _CinnamonLayer
-        {
-            get
-            {
-                var parent = _rhlyrs.FindName("Cinnamon");
-                if (parent == null)
-                {
-                    var p = new Layer()
-                    {
-                        Name = "Cinnamon",
-                        IsVisible = false,
-                        //IsLocked = true
-                    };
-                    // create parent layer
-                    _rhlyrs.Add(p);
-                    return _rhlyrs.FindName("Cinnamon");
-                }
-                else
-                {
-                    return parent;
-                }
-            }
-        }
-
-        private Layer _CaptureLayersParent
-        {
-            get
-            {
-                var parent = _rhlyrs.FindName(ObjectId);
-                if (parent == null)
-                {
-                    // create parent layer
-                    var p = new Layer()
-                    {
-                        Name = ObjectId,
-                        IsVisible = false,
-                        ParentLayerId = _CinnamonLayer.Id
-                        //IsLocked = true
-                    };
-                    _rhlyrs.Add(p);
-                    return _rhlyrs.FindName(ObjectId);
-                }
-                else
-                {
-                    return parent;
-                }
-            }
-        }
+        protected override string BasePath => _basePath;
+        private readonly string _basePath;
 
         public int Next
         {
             get
             {
-                RegenCaptureData();
-                if(Captures.Count == 0) { return 0; }
-                return Captures.Last() + 1;
+                Regen();
+                if(_captures.Count == 0) { return 0; }
+                return _captures.Keys.OrderByDescending(a => a).First() + 1;
             }
         }
 
-        void RegenCaptureData()
+        public CaptureManager_Object(Guid id)
         {
-            // gather doc layers
-            _Captures = null;
-            _Captures = new List<int>();
-            _CaptureLayers = new List<Layer>();
+            _basePath = $"ObjectCaptures/{id}";
 
-            foreach (var l in _rhlyrs.Where(l => l.ParentLayerId == _CaptureLayersParent.Id))
-            {
-                int Capture = -1;
-                if(!Int32.TryParse(l.Name, out Capture)) { continue; }
-                _Captures.Add(Capture);
-                _CaptureLayers.Add(l);
-            }
-            if(_Captures.Count == 0) { _Captures = null; return; }
-            _Captures.Sort();
-            _CaptureLayers.Sort((a, b) => Int32.Parse(a.Name).CompareTo(Int32.Parse(b.Name)));
-            //CaptureChanged?.Invoke(null, null);
+            Regen();
         }
 
-        internal SinglePointObjectOrientationState GetCaptureData(int Capture)
+        protected override ObjectOrientationState ExtractOrientation(LayerStoragePayload payload)
         {
-            if (!Captures.Contains(Capture)) { return null; }
-            int idx = Captures.IndexOf(Capture);
-            var objs = Rhino.RhinoDoc.ActiveDoc.Objects.FindByLayer(_CaptureLayers[idx]);
-            SinglePointObjectOrientationState output = new SinglePointObjectOrientationState(this.ObjectIdGuid);
-            foreach(var o in objs)
+            var layerPoints = payload.Points;
+            if (layerPoints.Count <= 2)
             {
-                if (o.Name.Contains(POINTNAME_LOCATION))
-                {
-                    //double focalLength = RhinoAppMappings.ActiveViewport.Camera35mmLensLength;
-                    //double.TryParse(o.Name.Split('_').Last(), out focalLength);
-                    output.PositionState = (o.Geometry as Point).Location;
-                }
-            }
-            return output;
-        }
-
-        public void CreateNewCapture(int Capture, Point3d location = default(Point3d))
-        {
-            Layer l = null;
-            int lyrIndex = -1;
-            if (Captures.Contains(Capture))
-            {
-                // Clear geometry from Capture
-                ClearCaptureData(Capture, out l);
-                lyrIndex = l.Index;
+                return new SinglePointObjectOrientationState(Id, layerPoints["A"]);
             }
             else
             {
-                // Create Capture layers
-                l = new Layer() {
-                    Name = Capture.ToString(),
-                    IsVisible = false,
-                    //IsLocked = true,
-                    ParentLayerId = _CaptureLayersParent.Id
-                };
-                lyrIndex = Rhino.RhinoDoc.ActiveDoc.Layers.Add(l);
-                l.ParentLayerId = _CaptureLayersParent.Id;
-                RegenCaptureData();
+                return new ThreePointObjectOrientationState(Id,
+                    layerPoints["A"],
+                    layerPoints["B"],
+                    layerPoints["C"]);
             }
-
-            // Create objects
-            Rhino.RhinoDoc.ActiveDoc.Objects.AddPoint(
-                location,
-                new ObjectAttributes() { 
-                    LayerIndex = lyrIndex, 
-                    Name = POINTNAME_LOCATION });
-
-            // donezo
         }
 
-        public bool ClearCaptureData(int Capture, out Layer layer)
+        protected override void CreateCapture(int order, ObjectOrientationState data = null)
         {
-            layer = null;
-            if (!_Captures.Contains(Capture)) { return false; }
-            layer = _CaptureLayers[_Captures.IndexOf(Capture)];
-            var objectsToDelete = Rhino.RhinoDoc.ActiveDoc.Objects.FindByLayer(layer);
-            foreach(var o in objectsToDelete)
-            {
-                Rhino.RhinoDoc.ActiveDoc.Objects.Delete(o);
-            }
-            return true;
+            throw new NotImplementedException();
         }
-
-        public void DeleteLayer(Layer layer) => Rhino.RhinoDoc.ActiveDoc.Layers.Delete(layer);
-
     }
 }

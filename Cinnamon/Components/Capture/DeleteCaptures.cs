@@ -1,4 +1,5 @@
-﻿using Cinnamon.Models;
+﻿using Cinnamon.Components.Capture.Managers;
+using Cinnamon.Models;
 using Grasshopper;
 using Grasshopper.Kernel;
 using Grasshopper.Kernel.Data;
@@ -79,56 +80,56 @@ namespace Cinnamon.Components.Capture
             }
             #endregion
 
-            List<int> captures = new List<int>();
-            DA.GetDataList(1, captures);
-            bool delete = false;
-            DA.GetData(2, ref delete);
-            bool deleteAll = false;
-            DA.GetData(3, ref deleteAll);
+            //List<int> captures = new List<int>();
+            //DA.GetDataList(1, captures);
+            //bool delete = false;
+            //DA.GetData(2, ref delete);
+            //bool deleteAll = false;
+            //DA.GetData(3, ref deleteAll);
 
-            bool success = false;
-            if (string.IsNullOrEmpty(objectId))
-            {
-                // Camera
-                if (deleteAll)
-                {
-                    foreach(var c in CaptureManager_Camera.Captures)
-                    {
-                        success = CaptureManager_Camera.ClearCaptureData(c, out var l) || success;
-                        CaptureManager_Camera.DeleteLayer(l);
-                    }    
-                }
-                else if(captures == null || captures.Count == 0 || !delete) { return; }
-                else {
-                    foreach(var c in captures)
-                    {
-                        success = CaptureManager_Camera.ClearCaptureData(c, out var l) || success;
-                        CaptureManager_Camera.DeleteLayer(l);
-                    }
-                }
-            }
-            else if (Guid.TryParse(objectId, out var objectIdGuid))
-            {
-                if(!Document_CaptureManagers.TryGetOrCreateCaptureManager(objectIdGuid, out var capManager)) { return; }
+            //bool success = false;
+            //if (string.IsNullOrEmpty(objectId))
+            //{
+            //    // Camera
+            //    if (deleteAll)
+            //    {
+            //        foreach(var c in CaptureManager_Camera.Captures)
+            //        {
+            //            success = CaptureManager_Camera.ClearCaptureData(c, out var l) || success;
+            //            CaptureManager_Camera.DeleteLayer(l);
+            //        }    
+            //    }
+            //    else if(captures == null || captures.Count == 0 || !delete) { return; }
+            //    else {
+            //        foreach(var c in captures)
+            //        {
+            //            success = CaptureManager_Camera.ClearCaptureData(c, out var l) || success;
+            //            CaptureManager_Camera.DeleteLayer(l);
+            //        }
+            //    }
+            //}
+            //else if (Guid.TryParse(objectId, out var objectIdGuid))
+            //{
+            //    if(!Document_CaptureManagers.TryGetOrCreateCaptureManager(objectIdGuid, out var capManager)) { return; }
 
-                if (deleteAll)
-                {
-                    foreach (var c in CaptureManager_Camera.Captures)
-                    {
-                        success = capManager.ClearCaptureData(c, out var l) || success;
-                        capManager.DeleteLayer(l);
-                    }
-                }
-                else if (captures == null || captures.Count == 0 || !delete) { return; }
-                else
-                {
-                    foreach (var c in captures)
-                    {
-                        success = capManager.ClearCaptureData(c, out var l) || success;
-                        capManager.DeleteLayer(l);
-                    }
-                }
-            }
+            //    if (deleteAll)
+            //    {
+            //        foreach (var c in CaptureManager_Camera.Captures)
+            //        {
+            //            success = capManager.ClearCaptureData(c, out var l) || success;
+            //            LayerStorageManager.DeleteLayer(l);
+            //        }
+            //    }
+            //    else if (captures == null || captures.Count == 0 || !delete) { return; }
+            //    else
+            //    {
+            //        foreach (var c in captures)
+            //        {
+            //            success = capManager.ClearCaptureData(c, out var l) || success;
+            //            LayerStorageManager.DeleteLayer(l);
+            //        }
+            //    }
+            //}
         }
 
         /// <summary>

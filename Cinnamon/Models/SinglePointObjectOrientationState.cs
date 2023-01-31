@@ -7,9 +7,7 @@ namespace Cinnamon.Models
     public class SinglePointObjectOrientationState : ObjectOrientationState
     {
 
-        public Point3d PositionState { get; internal set; }
-
-        public SinglePointObjectOrientationState(Guid id) : base(id) { }
+        public Point3d PositionState { get; internal set; } 
 
         public SinglePointObjectOrientationState(Guid id, Point3d loc) : base(id, loc) { PositionState = loc; }
 

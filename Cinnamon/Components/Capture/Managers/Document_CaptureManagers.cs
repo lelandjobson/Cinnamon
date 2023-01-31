@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 namespace Cinnamon.Components.Capture
 {
+
     public static class Document_CaptureManagers
     {
         private static Dictionary<Guid, CaptureManager_Object> Managers 

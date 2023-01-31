@@ -119,15 +119,15 @@ namespace Cinnamon.Components.Create
                 {
                     throw new Exception("Could not animate object.");
                 }
-                List<SinglePointObjectOrientationState> states = Captures.Select(o => omg.GetCaptureData(o)).ToList();
+                List<ObjectOrientationState> states = Captures.Select(o => omg.GetCaptureData(o)).ToList();
                 if (states.Count < 2) { throw new Exception("2 or more captures are required to produce an effect."); }
                 if (!interp)
                 {
-                    movement = new PolylineCurve(states.Select(s => s.PositionState));
+                    movement = new PolylineCurve(states.Select(s => s.A));
                 }
                 else
                 {
-                    movement = Curve.CreateInterpolatedCurve(states.Select(s => s.PositionState), 3);
+                    movement = Curve.CreateInterpolatedCurve(states.Select(s => s.A), 3);
                 }
                 effectsOutput.Add(new MoveObjectWithCapturesEffect(objectIdGuid, movement));
             }

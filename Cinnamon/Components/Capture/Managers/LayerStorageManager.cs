@@ -15,23 +15,23 @@ namespace Cinnamon.Components.Capture.Managers
     /// </summary>
     internal static class LayerStorageManager
     {
+        private const string CinnamonLayerRootName = "Cinnamon_Gh";
+
         private static LayerTable _rhlyrs => Rhino.RhinoDoc.ActiveDoc.Layers;
         private static Layer _cinnamonParentLayer
         {
             get
             {
-                var parent = _rhlyrs.FindName("Cinnamon");
+                var parent = _rhlyrs.FindName(CinnamonLayerRootName);
                 if (parent == null)
                 {
                     var p = new Layer()
                     {
-                        Name = "Cinnamon",
+                        Name = CinnamonLayerRootName,
                         IsVisible = false,
-                        //IsLocked = true
                     };
-                    // create parent layer
                     _rhlyrs.Add(p);
-                    return _rhlyrs.FindName("Cinnamon");
+                    return _rhlyrs.FindName(CinnamonLayerRootName);
                 }
                 else
                 {
@@ -40,23 +40,25 @@ namespace Cinnamon.Components.Capture.Managers
             }
         }
 
-        public static LayerStoragePayload Load(params string[] path)
+        public static void DeleteLayer(Layer layer) => Rhino.RhinoDoc.ActiveDoc.Layers.Delete(layer);
+
+
+        public static LayerStoragePayload ReadPayload(string path)
         {
             if(path.Length == 0) { throw new Exception("must provide path to load information from layer"); }
 
-            Layer cur = _cinnamonParentLayer;
-            for (int i =0; i < path.Length; i++)
-            {
-                cur = GetCinnamonLayer(path[i], cur, false);
-                if(cur == null)
-                {
-
-                }
-            }
-            return ReadPayload(cur);
+            //Layer cur = _cinnamonParentLayer;
+            //for (int i =0; i < path.Length; i++)
+            //{
+            //    cur = GetCinnamonLayer(path[i], cur, false);
+            //    if(cur == null)
+            //    {
+            //    }
+            //}
+            return Load(GetOrCreateLayerAtPath(path));
         }
 
-        public static LayerStoragePayload ReadPayload(Layer layer)
+        public static LayerStoragePayload Load(Layer layer)
         {
             Dictionary<string, Point3d> payloadData = new Dictionary<string, Point3d>(StringComparer.OrdinalIgnoreCase);
             var objs = Rhino.RhinoDoc.ActiveDoc.Objects.FindByLayer(layer);
@@ -65,11 +67,17 @@ namespace Cinnamon.Components.Capture.Managers
                 if (payloadData.ContainsKey(obj.Name)) { continue; }
                 payloadData.Add(obj.Name, obj.Geometry.ObjectType == ObjectType.Point ? (obj.Geometry as Point).Location : Point3d.Origin);
             }
-            return new LayerStoragePayload(payloadData);
+            return new LayerStoragePayload(layer,payloadData);
         }
 
-        public static void WritePayload(LayerStoragePayload payload, Layer layer)
+        public static void WritePayload(LayerStoragePayload payload)
         {
+            int layerIndex = RhinoAppMappings.DocumentLayers.FindByFullPath(payload.Layer.FullPath,-99);
+            if(layerIndex == -99) { 
+                var layerFixed = GetOrCreateLayerAtPath(payload.Layer.FullPath); 
+                payload.SetLayer(layerFixed); 
+                WritePayload(payload); 
+            }
             foreach (var point in payload.Points)
             {
                 // Create objects
@@ -77,32 +85,65 @@ namespace Cinnamon.Components.Capture.Managers
                     point.Value,
                     new ObjectAttributes()
                     {
-                        LayerIndex = layer.Index,
+                        LayerIndex = layerIndex,
                         Name = point.Key,
                     });
             }
         }
 
-        public static void Store(LayerStoragePayload payload, bool clearPrevious = true, params string[] path)
+        public static Layer GetOrCreateLayerAtPath(string path)
         {
-            if(path.Length == 0) { throw new Exception("must provide path to store information to layer"); }
+            int layerIndex = _rhlyrs.FindByFullPath(CreatePath(path), -99);
+            if(layerIndex == -99)
+            {
+                // Create new layer
+                string[] pathPieces = path.Split('/');
+                Layer parent = _cinnamonParentLayer;
+                for(int i = 0; i < pathPieces.Length; i++)
+                {
+                    string curLayer = pathPieces[i];
+                    Layer existingLayer = parent.GetChildren().FirstOrDefault(l => l.Name.Equals(curLayer, StringComparison.OrdinalIgnoreCase));
+                    if(existingLayer != null)
+                    {
+                        parent = existingLayer;
+                        continue;
+                    }
+                    else
+                    {
+                        var l = new Layer()
+                        {
+                            Name = curLayer,
+                            IsVisible = false,
+                            //IsLocked = true,
+                            ParentLayerId = parent.Id
+                        };
+                        int lyrIndex = Rhino.RhinoDoc.ActiveDoc.Layers.Add(l);
+                        l.ParentLayerId = parent.Id;
+                        parent = l;
+                    }
+                }
+                return parent;
+                // May need to call regen
+            }
+            return _rhlyrs[layerIndex];
+        }
 
+        static string CreatePath(string path) => $"{CinnamonLayerRootName}/{path}".Replace("//","/");
+
+        public static void Store(LayerStoragePayload payload, bool clearPrevious = true)
+        {
             try
             {
-                Layer cur = _cinnamonParentLayer;
-                for (int i = 0; i < path.Length; i++)
-                {
-                    cur = GetCinnamonLayer(path[i], cur, true);
-                }
+                Layer layer = payload.Layer;
                 if (clearPrevious)
                 {
-                    var objectsToDelete = Rhino.RhinoDoc.ActiveDoc.Objects.FindByLayer(cur);
+                    var objectsToDelete = Rhino.RhinoDoc.ActiveDoc.Objects.FindByLayer(layer);
                     foreach (var o in objectsToDelete)
                     {
                         Rhino.RhinoDoc.ActiveDoc.Objects.Delete(o);
                     }
                 }
-                WritePayload(payload, cur);
+                WritePayload(payload);
             }
             catch (Exception ex)
             {
