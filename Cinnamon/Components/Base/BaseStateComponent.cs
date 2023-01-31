@@ -33,6 +33,7 @@ namespace Cinnamon.Components.Base
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
+            pManager.AddBooleanParameter("Reset", "Reset", "Resets the base state of the document", GH_ParamAccess.item);
         }
 
 
@@ -50,10 +51,18 @@ namespace Cinnamon.Components.Base
         /// to store data in output parameters.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
+            bool reset = false;
+            if(DA.GetData<bool>(0, ref reset) && reset)
+            {
+                // Reset base state
+                DocumentBaseState.ActiveBase.Reset();
+            }
+
             // Read out statistics
             this.Message = $"Initialized: {DocumentBaseState.HasBeenInitialized} \n" +
                 $"Objects: {DocumentBaseState.ActiveBase.ObjectBaseStateCount} \n" +
-                $"Path: {DocumentBaseState.ActiveBase.SavePath}";
+                //$"Path: {DocumentBaseState.ActiveBase.SavePath} +" +
+                $"Viewport: {DocumentBaseState.ActiveBase.Viewport.Name}";
         }
 
         /// <summary>

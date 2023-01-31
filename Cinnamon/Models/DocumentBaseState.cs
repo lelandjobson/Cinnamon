@@ -75,6 +75,14 @@ namespace Cinnamon.Models
             Notify();
         }
 
+        internal void Reset()
+        {
+            RestoreObjectsBaseStates();
+            _objectStates.Clear();
+            this.View = RhinoAppMappings.ActiveView;
+            Notify();
+        }
+
         /// <summary>
         /// Creates a new base state from the active viewport
         /// </summary>
@@ -88,7 +96,7 @@ namespace Cinnamon.Models
         public static string GetCinnamonSavePathForActiveDoc()
         {
             string docPath = RhinoDoc.ActiveDoc.Path;
-            if (!String.IsNullOrEmpty(docPath))
+            if (String.IsNullOrEmpty(docPath))
             {
                 throw new Exception("Rhino document must be saved in order to use Cinnamon!");
             }
@@ -182,6 +190,7 @@ namespace Cinnamon.Models
             try
             {
                 this.SavePath = GetCinnamonSavePathForActiveDoc();
+                Notify();
             }
             catch {
                 // Document not saved yet.
@@ -192,7 +201,7 @@ namespace Cinnamon.Models
         /// Restores the base state of all of the objects
         /// tracked by this
         /// </summary>
-        public void RestoreObjectsBaseState()
+        public void RestoreObjectsBaseStates()
         {
             foreach(var o  in _objectStates)
             {
