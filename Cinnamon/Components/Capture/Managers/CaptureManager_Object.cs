@@ -8,10 +8,8 @@ using System.Linq;
 
 namespace Cinnamon.Components.Capture
 {
-
     public class CaptureManager_Object
     {
-        public event EventHandler CaptureChanged;
         public List<int> Captures
         {
             get
@@ -36,6 +34,30 @@ namespace Cinnamon.Components.Capture
             ObjectId = objectId.ToString();
         }
 
+        private static Layer _CinnamonLayer
+        {
+            get
+            {
+                var parent = _rhlyrs.FindName("Cinnamon");
+                if (parent == null)
+                {
+                    var p = new Layer()
+                    {
+                        Name = "Cinnamon",
+                        IsVisible = false,
+                        //IsLocked = true
+                    };
+                    // create parent layer
+                    _rhlyrs.Add(p);
+                    return _rhlyrs.FindName("Cinnamon");
+                }
+                else
+                {
+                    return parent;
+                }
+            }
+        }
+
         private Layer _CaptureLayersParent
         {
             get
@@ -48,6 +70,7 @@ namespace Cinnamon.Components.Capture
                     {
                         Name = ObjectId,
                         IsVisible = false,
+                        ParentLayerId = _CinnamonLayer.Id
                         //IsLocked = true
                     };
                     _rhlyrs.Add(p);
@@ -90,12 +113,12 @@ namespace Cinnamon.Components.Capture
             //CaptureChanged?.Invoke(null, null);
         }
 
-        internal ObjectState GetCaptureData(int Capture)
+        internal SinglePointObjectOrientationState GetCaptureData(int Capture)
         {
             if (!Captures.Contains(Capture)) { return null; }
             int idx = Captures.IndexOf(Capture);
             var objs = Rhino.RhinoDoc.ActiveDoc.Objects.FindByLayer(_CaptureLayers[idx]);
-            ObjectState output = new ObjectState(this.ObjectIdGuid);
+            SinglePointObjectOrientationState output = new SinglePointObjectOrientationState(this.ObjectIdGuid);
             foreach(var o in objs)
             {
                 if (o.Name.Contains(POINTNAME_LOCATION))

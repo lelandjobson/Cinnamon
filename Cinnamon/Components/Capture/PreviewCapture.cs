@@ -24,7 +24,7 @@ namespace Cinnamon.Components.Capture
         public PreviewCapture()
           : base("PreviewCapture", "PreviewCapture",
             "Previews an object Capture from the document",
-            "Cinnamon", "0_Capture")
+            "Cinnamon", "1_Capture")
         {
         }
 
@@ -85,7 +85,7 @@ namespace Cinnamon.Components.Capture
             if (string.IsNullOrEmpty(objectId))
             {
                 // camera
-                Player.MainPlayer.RenderCameraState(CaptureManager_Camera.GetCaptureData(Capture));
+                Player.DefaultPlayer.RenderCameraState(CaptureManager_Camera.GetCaptureData(Capture));
                 this.Message = "Rendering Camera";
                 return;
             }
@@ -97,9 +97,10 @@ namespace Cinnamon.Components.Capture
                 return;
             }
 
-            var objState = Document_CaptureManagers.GetOrCreateCaptureManager(gid).GetCaptureData(Capture);
+            if(!Document_CaptureManagers.TryGetOrCreateCaptureManager(gid, out var objState)) { this.Message = "unable to render object"; return; }
+            
             this.Message = "Rendering Object";
-            Player.MainPlayer.RenderObjectState(objState);
+            Player.DefaultPlayer.RenderObjectState(objState.GetCaptureData(Capture));
         }
 
         /// <summary>

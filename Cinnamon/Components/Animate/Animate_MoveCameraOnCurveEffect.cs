@@ -20,7 +20,7 @@ namespace Cinnamon.Components.Create
         public Animate_MoveCameraOnCurveEffect()
           : base("MoveCameraOnCurve", "MoveCameraOnCurve",
             "Moves the camera along a curve",
-            "Cinnamon", "1_Animate")
+            "Cinnamon", "2_Animate")
         {
         }
 

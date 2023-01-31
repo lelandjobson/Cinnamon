@@ -19,7 +19,7 @@ namespace Cinnamon.Components.Create
         public TimeRangeStartDuration()
           : base("TimeRange Start-Duration", "TimeRangeSD",
             "Creates a TimeRange given a start and duration in seconds",
-            "Cinnamon", "2_Build")
+            "Cinnamon", "3_Build")
         {
         }
 

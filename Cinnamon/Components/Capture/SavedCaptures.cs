@@ -22,7 +22,7 @@ namespace Cinnamon.Components.Capture
         public SavedCaptures()
           : base("SavedCaptures", "SavedCaptures",
             "Loads saved captures from the document",
-            "Cinnamon", "0_Capture")
+            "Cinnamon", "1_Capture")
         {
         }
 
@@ -88,7 +88,15 @@ namespace Cinnamon.Components.Capture
 
             //if (!Document_CaptureManagers.ContainsCapture(objectIdGuid)) { this.Message = "Could not find Captures \n for that object."; return; }
             this.Message = "Object";
-            DA.SetDataList(0, Document_CaptureManagers.GetOrCreateCaptureManager(objectIdGuid).Captures ?? new List<int>());
+
+            if(!Document_CaptureManagers.TryGetOrCreateCaptureManager(objectIdGuid, out var capMap))
+            {
+                DA.SetDataList(0, new List<int>());
+            }
+            else
+            {
+                DA.SetDataList(0, capMap.Captures ?? new List<int>());
+            }
         }
 
         /// <summary>

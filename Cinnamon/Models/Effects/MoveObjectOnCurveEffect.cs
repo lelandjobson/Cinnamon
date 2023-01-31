@@ -80,14 +80,14 @@ namespace Cinnamon.Models.Effects
             var loc = GetValue(percentage);
             if (!state.ObjectPositionStates.ContainsKey(ObjectId))
             {
-                state.ObjectPositionStates.Add(ObjectId, new ObjectState(ObjectId, loc));
+                state.ObjectPositionStates.Add(ObjectId, new SinglePointObjectOrientationState(ObjectId, loc));
             }
             else
             {
                 Logger.Log(
                     $"Object location being overrided by effect \"{Name}\"");
 
-                state.ObjectPositionStates[ObjectId] = new ObjectState(ObjectId, loc);
+                state.ObjectPositionStates[ObjectId] = new SinglePointObjectOrientationState(ObjectId, loc);
             }
         }
     }

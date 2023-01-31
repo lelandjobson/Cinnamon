@@ -22,7 +22,7 @@ namespace Cinnamon.Components.Capture
         public DeleteCaptures()
           : base("DeleteCaptures", "DeleteCaptures",
             "Deletes saved captures from the document",
-            "Cinnamon", "0_Capture")
+            "Cinnamon", "1_Capture")
         {
         }
 
@@ -109,7 +109,7 @@ namespace Cinnamon.Components.Capture
             }
             else if (Guid.TryParse(objectId, out var objectIdGuid))
             {
-                var capManager = Document_CaptureManagers.GetOrCreateCaptureManager(objectIdGuid);
+                if(!Document_CaptureManagers.TryGetOrCreateCaptureManager(objectIdGuid, out var capManager)) { return; }
 
                 if (deleteAll)
                 {

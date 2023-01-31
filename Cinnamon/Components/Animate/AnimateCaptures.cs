@@ -24,7 +24,7 @@ namespace Cinnamon.Components.Create
         public AnimateCaptures()
           : base("AnimateCaptures ", "AnimateCaptures ",
             "Creates a movement from Captures",
-            "Cinnamon", "1_Animate")
+            "Cinnamon", "2_Animate")
         {
         }
 
@@ -115,8 +115,11 @@ namespace Cinnamon.Components.Create
                 if (!Guid.TryParse(objectId, out objectIdGuid)) { return; }
                 // Object motion effect
                 Curve movement;
-                var omg = Document_CaptureManagers.GetOrCreateCaptureManager(objectIdGuid);
-                List<ObjectState> states = Captures.Select(o => omg.GetCaptureData(o)).ToList();
+                if(!Document_CaptureManagers.TryGetOrCreateCaptureManager(objectIdGuid, out var omg))
+                {
+                    throw new Exception("Could not animate object.");
+                }
+                List<SinglePointObjectOrientationState> states = Captures.Select(o => omg.GetCaptureData(o)).ToList();
                 if (states.Count < 2) { throw new Exception("2 or more captures are required to produce an effect."); }
                 if (!interp)
                 {

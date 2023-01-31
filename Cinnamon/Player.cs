@@ -1,5 +1,6 @@
 ﻿using Cinnamon.Components.Capture;
 using Cinnamon.Models;
+using Rhino;
 using Rhino.DocObjects;
 using Rhino.Geometry;
 using System;
@@ -16,11 +17,14 @@ namespace Cinnamon
     {
         public PlayStyle PlayStyle { get; set; }
 
-        public Player() { }
+        public static Player DefaultPlayer = new Player();
 
-        private FrameState _previousState = FrameState.BaseState;
+        public Player() {
+        }
 
-        bool _isNewMovie = true;
+
+        private FrameState _previousState = DocumentBaseState.ActiveBase.FrameState;
+
 
         public Movie Movie
         {
@@ -29,7 +33,6 @@ namespace Cinnamon
             {
                 if(_movie == value) { return; }
                 _movie = value;
-                _isNewMovie = true;
             }
         }
         private Movie _movie;
@@ -52,7 +55,7 @@ namespace Cinnamon
 
         public void ScanFrame(int frame, bool backTracking = false)
         {
-            if(_movie == null || frame < 0) { return; }
+            if (_movie == null || frame < 0) { return; }
 
             if(!backTracking)
             {
@@ -93,29 +96,37 @@ namespace Cinnamon
             //RhinoAppMappings.ActiveViewport.SetCameraTarget(state.TargetPositionState, false);
             if (!double.IsNaN(state.FocalLengthState))
             {
-                RhinoAppMappings.ActiveViewport.Camera35mmLensLength = state.FocalLengthState;
+                DocumentBaseState.ActiveBase.Viewport.Camera35mmLensLength = state.FocalLengthState;
             }
             if(state.PositionState != Point3d.Unset && state.TargetPositionState != Point3d.Unset)
             {
-                RhinoAppMappings.ActiveViewport.SetCameraLocations(state.TargetPositionState, state.PositionState);
+                DocumentBaseState.ActiveBase.Viewport.SetCameraLocations(state.TargetPositionState, state.PositionState);
             }
             else if(state.PositionState == Point3d.Unset && state.TargetPositionState != Point3d.Unset)
             {
-                RhinoAppMappings.ActiveViewport.SetCameraTarget(state.TargetPositionState, false);
+                DocumentBaseState.ActiveBase.Viewport.SetCameraTarget(state.TargetPositionState, false);
             }
             else if(state.PositionState != Point3d.Unset && state.TargetPositionState == Point3d.Unset)
             {
-                RhinoAppMappings.ActiveViewport.SetCameraLocation(state.PositionState, false);
+                DocumentBaseState.ActiveBase.Viewport.SetCameraLocation(state.PositionState, false);
             }
         }
 
-        public void RenderObjectState(ObjectState state)
+        public void RenderObjectState(ObjectOrientationState state)
         {
-            var rhObj = state.Id.ToDocumentObject();
-            var vec = state.PositionState - rhObj.ToBBPoint();
-            //rhObj.Geometry.Translate(vec); 
-            //RhinoDoc.ActiveDoc.Objects.Transform(state.Id, Transform.Translation(vec), true);
-            Rhino.RhinoDoc.ActiveDoc.Objects.Transform(rhObj.Id, Transform.Translation(vec), true);
+            state.Apply();
+
+            //if(state.Kind == OrientationStateKind.ThreePoint)
+            //{
+
+            //}
+            //else
+            //{
+            //    // Single point orientation
+            //    var rhObj = state.Id.ToDocumentObject();
+            //    var vec = state.A - rhObj.ToBBPoint();
+            //    Rhino.RhinoDoc.ActiveDoc.Objects.Transform(rhObj.Id, Transform.Translation(vec), true);
+            //}
         }
 
         /// <summary>
@@ -126,8 +137,10 @@ namespace Cinnamon
         /// <param name="prevState">Previous state is required for tween animations</param>
         public void RenderState(FrameState curState, FrameState prevState)
         {
-            // Camera
+            // Ensure correct viewport is rendering
+            RhinoAppMappings.ActiveView = DocumentBaseState.ActiveBase.View;
 
+            // Camera
             RenderCameraState(curState.CameraState);
 
             if (curState.HasLayerStates)
@@ -154,41 +167,10 @@ namespace Cinnamon
                 foreach(var objectInMotion in curState.ObjectPositionStates.Keys)
                 {
                     RenderObjectState(curState.ObjectPositionStates[objectInMotion]);
-                    //// Move object to location
-                    //if (_docObjects.TryGetValue(objectInMotion, out var ro))
-                    //{
-                    //    Rhino.RhinoDoc.ActiveDoc.Objects.Transform(
-                    //        objectInMotion, 
-                    //        Transform.Translation(
-                    //            objectInMotion.ToDocumentObject().GetCriticalPoint().VectorTo(curState.ObjectPositionStates[objectInMotion])), true);
-
-                    //}
                 }
             }
 
             _previousState = curState;
         }
-
-
-        #region Static members
-
-        private static Guid MainPlayerId = Guid.NewGuid();
-
-        private static Dictionary<Guid, Player> _players = new Dictionary<Guid, Player>();
-
-        public static Player MainPlayer
-        {
-            get
-            {
-                if (!_players.ContainsKey(MainPlayerId))
-                {
-                    _players.Add(MainPlayerId, new Player());
-                }
-                return _players[MainPlayerId];
-            }
-        }
-
-
-        #endregion
     }
 }

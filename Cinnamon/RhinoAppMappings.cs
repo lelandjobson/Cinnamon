@@ -19,18 +19,6 @@ namespace Cinnamon
             Rhino.RhinoDoc.ActiveDoc.Objects.FindByLayer(l);
         
 
-        public static string ForceView
-        {
-            get => _forceView;
-            set
-            {
-                if(_forceView != value)
-                {
-                    _forceView = value;
-                }
-            }
-        }
-        private static string _forceView = String.Empty;
 
         public static RhinoViewport ActiveViewport => ActiveView.ActiveViewport;
 
@@ -38,16 +26,11 @@ namespace Cinnamon
         {
             get
             {
-                if(_forceView != null)
-                {
-                    return Rhino.RhinoDoc.ActiveDoc.Views.FirstOrDefault(v => v.ActiveViewport.Name.Equals(_forceView)) ??
-                       //Rhino.RhinoDoc.ActiveDoc.NamedViews.FirstOrDefault(v => v.Name.Equals(_forceView, StringComparison.OrdinalIgnoreCase)) ??
-                           Rhino.RhinoDoc.ActiveDoc.Views.ActiveView;
-                }
-                else
-                {
-                    return Rhino.RhinoDoc.ActiveDoc.Views.ActiveView;
-                }
+                return Rhino.RhinoDoc.ActiveDoc.Views.ActiveView;
+            }
+            set
+            {
+                Rhino.RhinoDoc.ActiveDoc.Views.ActiveView = value;
             }
         }
 

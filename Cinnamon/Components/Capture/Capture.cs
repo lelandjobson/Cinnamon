@@ -23,7 +23,7 @@ namespace Cinnamon.Components.Capture
         public Capture()
           : base("Capture", "Capture",
             "Captures the camera or given object location and saves it to an Capture.",
-            "Cinnamon", "0_Capture")
+            "Cinnamon", "1_Capture")
         {
         }
 
@@ -101,7 +101,10 @@ namespace Cinnamon.Components.Capture
                 return;
             }
 
-            var objManager = Document_CaptureManagers.GetOrCreateCaptureManager(gid);
+            if (!Document_CaptureManagers.TryGetOrCreateCaptureManager(gid, out var objManager))
+            {
+                throw new Exception("Could not animate object.");
+            }
             objManager.CreateNewCapture(Capture,rhobj.GetCriticalPoint());
             this.Message = $"Capture {Capture} Saved";
 

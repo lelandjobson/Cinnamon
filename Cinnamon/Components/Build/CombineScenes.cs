@@ -20,7 +20,7 @@ namespace Cinnamon.Components.Create
         public CombineScenes()
           : base("CombineScenes", "CombineScenes",
             "Combines scenes together into one",
-            "Cinnamon", "2_Build")
+            "Cinnamon", "3_Build")
         {
         }
 

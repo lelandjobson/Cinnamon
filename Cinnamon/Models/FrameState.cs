@@ -21,22 +21,45 @@ namespace Cinnamon.Models
 
         #endregion
 
+
+        /// <summary>
+        /// State of the current document.
+        /// </summary>
+        public static FrameState BaseState() =>
+            new FrameState(null, 0)
+            {
+                _layerStates = RhinoAppMappings.DocumentLayers.ToDictionary(
+                    l => l,
+                    l => new LayerState { IsVisible = l.IsVisible, TransparencyState = l.GetTransparency() }
+                    ),
+
+                _objectPositionStates = Rhino.RhinoDoc.ActiveDoc.Objects
+                    .GetObjectList(Rhino.DocObjects.ObjectType.AnyObject)
+                    .ToDictionary(o => o.Id, o => o.TryGetOrientationState(out var state) ? state : new SinglePointObjectOrientationState(o.Id, Point3d.Unset)),
+                CameraState = new CameraState(DocumentBaseState.ActiveBase.ViewportId)
+                {
+                    PositionState = RhinoAppMappings.ActiveView.ActiveViewport.CameraLocation,
+                    TargetPositionState = RhinoAppMappings.ActiveView.ActiveViewport.CameraTarget,
+                    FocalLengthState = RhinoAppMappings.ActiveView.ActiveViewport.Camera35mmLensLength,
+                }
+            };
+
         #region State data
 
-        public CameraState CameraState = new CameraState();
+        public CameraState CameraState { get; set; }
 
         public List<Action<FrameState>> FrameActions = new List<Action<FrameState>>();
 
-        public Dictionary<Guid, ObjectState> ObjectPositionStates
+        public Dictionary<Guid, ObjectOrientationState> ObjectPositionStates
         {
             get
             {
-                if(_objectPositionStates == null) { _objectPositionStates = new Dictionary<Guid, ObjectState>(); }
+                if(_objectPositionStates == null) { _objectPositionStates = new Dictionary<Guid, ObjectOrientationState>(); }
                 HasObjectsAnimating = true;
                 return _objectPositionStates;
             }
         }
-        private Dictionary<Guid, ObjectState> _objectPositionStates;
+        private Dictionary<Guid, ObjectOrientationState> _objectPositionStates;
 
         public bool HasLayerStates = false;
 
@@ -62,55 +85,5 @@ namespace Cinnamon.Models
 
 
         public FrameState(Movie movie, int frameNumber) { _parent = movie; KeyFrame = frameNumber; }
-
-        #region Base state
-
-        /// <summary>
-        /// The original framestate of all of the objects in the rhino document.
-        /// Used to properly reset all of the objects to their locations.
-        /// </summary>
-        public static FrameState BaseState
-        {
-            get
-            {
-                if (_baseState == null) { ExpireBaseState(false); }
-                return _baseState;
-            }
-        }
-        private static FrameState _baseState;
-
-        public static void ExpireBaseState(bool resetDocObjects = true)
-        {
-            if (resetDocObjects && _baseState != null)
-            {
-                // TODO
-                // Render old state? IDK
-            }
-            _baseState = CurrentDocumentState;
-        }
-
-        /// <summary>
-        /// State of the current document.
-        /// </summary>
-        public static FrameState CurrentDocumentState =>
-            new FrameState(null, 0)
-            {
-                _layerStates = RhinoAppMappings.DocumentLayers.ToDictionary(
-                    l => l,
-                    l => new LayerState { IsVisible = l.IsVisible, TransparencyState = l.GetTransparency() }
-                    ),
-
-                _objectPositionStates = Rhino.RhinoDoc.ActiveDoc.Objects
-                    .GetObjectList(Rhino.DocObjects.ObjectType.AnyObject)
-                    .ToDictionary(o => o.Id, o => new ObjectState(o.Id, Point3d.Unset)),
-                CameraState = new CameraState()
-                {
-                    PositionState = RhinoAppMappings.ActiveView.ActiveViewport.CameraLocation,
-                    TargetPositionState = RhinoAppMappings.ActiveView.ActiveViewport.CameraTarget,
-                    FocalLengthState = RhinoAppMappings.ActiveView.ActiveViewport.Camera35mmLensLength,
-                }
-            };
-
-        #endregion
     }
 }

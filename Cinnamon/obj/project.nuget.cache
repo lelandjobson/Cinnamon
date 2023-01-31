@@ -1,10 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "RSjPo9NKjDl0+cOLvlo9oWulBoHaVjY2UVAgNnU+8TF1son968rRo0RYAcsd/sFlMiOa8svY3Rqwi3D31cAmpw==",
+  "dgSpecHash": "Ai1pWHFXHURMrG9RzXyljmsMn7OdHYlaprwxN51PqwR2E6ZKy1e99Mwp3B3Z9PQLQarRnNo6vJF6a65BMAFbiA==",
   "success": true,
   "projectFilePath": "C:\\Users\\Leland\\Documents\\GitHub\\Cinnamon\\Cinnamon\\Cinnamon.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Leland\\.nuget\\packages\\grasshopper\\6.35.21222.17001\\grasshopper.6.35.21222.17001.nupkg.sha512",
+    "C:\\Users\\Leland\\.nuget\\packages\\newtonsoft.json\\13.0.2\\newtonsoft.json.13.0.2.nupkg.sha512",
     "C:\\Users\\Leland\\.nuget\\packages\\rhinocommon\\6.35.21222.17001\\rhinocommon.6.35.21222.17001.nupkg.sha512"
   ],
   "logs": []

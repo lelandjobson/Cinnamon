@@ -22,7 +22,7 @@ namespace Cinnamon.Components.Create
         public Animate_ChangeLayerVisibilityEffect()
           : base("ChangeLayerVisibility", "ChangeLayerVisibility",
             "Changes the visibility of provided layers in the document at an interval of time",
-            "Cinnamon", "1_Animate")
+            "Cinnamon", "2_Animate")
         {
         }
 
@@ -58,9 +58,6 @@ namespace Cinnamon.Components.Create
             List<string> layerNames = new List<string>();
             List<bool> states = new List<bool>();
             bool hideOthers = false;
-            //List<bool> layerStates = new List<bool>();
-            double start = 0;
-            double end = 0;
 
             if (!DA.GetDataList(0, layerNames)) { return; }
             if (!DA.GetDataList(1, states)) { return; }

@@ -20,11 +20,11 @@ namespace Cinnamon.Components.Create
         public CreatePlayer()
           : base("Player", "Player",
             "Playes a movie",
-            "Cinnamon", "3_Play")
+            "Cinnamon", "4_Play")
         {
         }
 
-        private static Player _mainPlayer => __mainPlayer ?? (__mainPlayer = Player.MainPlayer);
+        private static Player _mainPlayer => __mainPlayer ?? (__mainPlayer = Player.DefaultPlayer);
         private static Player __mainPlayer;
 
         /// <summary>

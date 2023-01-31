@@ -8,7 +8,7 @@ namespace Cinnamon.Models
     /// view camera necessary for the app
     /// </summary>
     [Serializable]
-    public class CameraState
+    public class CameraState : ObjectOrientationState
     {
 
         public Point3d PositionState = Point3d.Unset;
@@ -17,5 +17,8 @@ namespace Cinnamon.Models
 
         public double FocalLengthState = -1;
 
+        public CameraState(Guid id, params Point3d[] points) : base(id, points)
+        {
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Cinnamon.Models;
+using System;
 using System.Collections.Generic;
 
 namespace Cinnamon.Components.Capture
@@ -8,13 +9,23 @@ namespace Cinnamon.Components.Capture
         private static Dictionary<Guid, CaptureManager_Object> Managers 
             = new Dictionary<Guid, CaptureManager_Object>();
 
-        public static CaptureManager_Object GetOrCreateCaptureManager(Guid id)
+        public static bool TryGetOrCreateCaptureManager(Guid id, out CaptureManager_Object capMan)
         {
             if (!Managers.ContainsKey(id))
             {
-                Managers.Add(id, new CaptureManager_Object(id));
+                if(ObjectOrientationState.TryCreate(id, out var baseOrientation))
+                {
+                    Managers.Add(id, new CaptureManager_Object(id));
+                    DocumentBaseState.ActiveBase.AddObjectBaseState(id, baseOrientation);
+                }
+                else
+                {
+                    capMan = null;
+                    return false;
+                }
             }
-            return Managers[id];    
+            capMan = Managers[id];
+            return true;
         }
 
         internal static bool ContainsCapture(Guid gid)

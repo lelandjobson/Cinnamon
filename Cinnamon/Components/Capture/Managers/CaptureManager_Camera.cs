@@ -10,7 +10,6 @@ namespace Cinnamon.Components.Capture
 {
     public static class CaptureManager_Camera
     {
-        public static event EventHandler CaptureChanged;
 
         public const string CAMERA_ORDERSPARENTNAME = "cinnamon_cameras";
 
@@ -30,6 +29,30 @@ namespace Cinnamon.Components.Capture
 
         private static LayerTable _rhlyrs => Rhino.RhinoDoc.ActiveDoc.Layers;
 
+        private static Layer _CinnamonLayer
+        {
+            get
+            {
+                var parent = _rhlyrs.FindName("Cinnamon");
+                if (parent == null)
+                {
+                    // create parent layer
+                    var p = new Layer()
+                    {
+                        Name = "Cinnamon",
+                        IsVisible = false,
+                        //IsLocked = true
+                    };
+                    _rhlyrs.Add(p);
+                    return _rhlyrs.FindName("Cinnamon");
+                }
+                else
+                {
+                    return parent;
+                }
+            }
+        }
+
         private static Layer _orderLayersParent
         {
             get
@@ -42,6 +65,7 @@ namespace Cinnamon.Components.Capture
                     {
                         Name = CAMERA_ORDERSPARENTNAME,
                         IsVisible = false,
+                        ParentLayerId = _CinnamonLayer.Id
                         //IsLocked = true
                     };
                     _rhlyrs.Add(p);
@@ -66,6 +90,8 @@ namespace Cinnamon.Components.Capture
 
         static void RegenCaptureData()
         {
+            // TODO - modify to use payload system
+
             // gather doc layers
             _orders = null;
             _orders = new List<int>();
@@ -89,7 +115,7 @@ namespace Cinnamon.Components.Capture
             if (!Captures.Contains(order)) { return null; }
             int idx = Captures.IndexOf(order);
             var objs = Rhino.RhinoDoc.ActiveDoc.Objects.FindByLayer(_orderLayers[idx]);
-            CameraState output = new CameraState();
+            CameraState output = new CameraState(RhinoAppMappings.ActiveViewport.Id);
             foreach(var o in objs)
             {
                 if (o.Name.Contains(POINTNAME_CAMERALOCATION))
