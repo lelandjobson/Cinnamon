@@ -19,7 +19,7 @@ namespace Cinnamon.Components.Create
         public TimeRangeStartEnd()
           : base("TimeRange Start-End", "TimeRangeSE",
             "Creates a TimeRange given a start and end time in seconds",
-            "Cinnamon", "2_Build")
+            "Cinnamon", "3_Build")
         {
         }
 

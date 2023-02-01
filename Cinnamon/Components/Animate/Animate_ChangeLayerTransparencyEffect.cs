@@ -21,7 +21,7 @@
 //        public Animate_ChangeLayerTransparencyEffect()
 //          : base("ChangeLayerTransparency", "ChangeLayerTransparency",
 //            "Changes the transparency of the materials on objects on layers",
-//            "Cinnamon", "1_Animate")
+//            "Cinnamon", "2_Animate")
 //        {
 //        }
 

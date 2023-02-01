@@ -1,173 +1,95 @@
-﻿using Cinnamon.Models;
+﻿using Cinnamon.Components.Capture.Managers;
 using Rhino.DocObjects;
-using Rhino.DocObjects.Tables;
-using Rhino.Geometry;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Cinnamon.Components.Capture
 {
-    public static class CaptureManager_Camera
+    public abstract class CaptureManager<T>
     {
-        public static event EventHandler CaptureChanged;
+        protected abstract string BasePath { get; }
 
-        public const string CAMERA_ORDERSPARENTNAME = "cinnamon_cameras";
+        protected abstract T ExtractOrientation(LayerStoragePayload payload);
 
-        public const string POINTNAME_CAMERALOCATION = "loc";
-        public const string POINTNAME_CAMERATARGET   = "tar";
+        public T GetCaptureData(int cap) => ExtractOrientation(_captures[cap]);
 
-        public static List<int> Captures
+        public List<int> CaptureKeys => _captures.Keys.ToList().OrderBy(x => x).ToList();
+
+        public int NextCaptureKey
         {
             get
             {
-                RegenCaptureData();
-                return _orders?.ToList() ?? new List<int>();
-            }
-        }
-        private static List<int> _orders;
-        private static List<Layer> _orderLayers;
-
-        private static LayerTable _rhlyrs => Rhino.RhinoDoc.ActiveDoc.Layers;
-
-        private static Layer _orderLayersParent
-        {
-            get
-            {
-                var parent = _rhlyrs.FindName(CAMERA_ORDERSPARENTNAME);
-                if (parent == null)
-                {
-                    // create parent layer
-                    var p = new Layer()
-                    {
-                        Name = CAMERA_ORDERSPARENTNAME,
-                        IsVisible = false,
-                        //IsLocked = true
-                    };
-                    _rhlyrs.Add(p);
-                    return _rhlyrs.FindName(CAMERA_ORDERSPARENTNAME);
-                }
-                else
-                {
-                    return parent;
-                }
+                Regen();
+                return _captures.Count == 0 ? 0 : CaptureKeys.Last() + 1;
             }
         }
 
-        public static int Next
+        protected Dictionary<int, LayerStoragePayload> _captures = new Dictionary<int, LayerStoragePayload>();
+
+        public CaptureManager()
         {
-            get
-            {
-                RegenCaptureData();
-                if(Captures.Count == 0) { return 0; }
-                return Captures.Last() + 1;
-            }
+
         }
 
-        static void RegenCaptureData()
-        {
-            // gather doc layers
-            _orders = null;
-            _orders = new List<int>();
-            _orderLayers = new List<Layer>();
+        /// <summary>
+        /// Call from outside to regenerate this capman
+        /// from the document 
+        /// </summary>
+        internal void ForceRegen() => Regen();
 
-            foreach (var l in _rhlyrs.Where(l => l.ParentLayerId == _orderLayersParent.Id))
-            {
-                int order = -1;
-                if(!Int32.TryParse(l.Name, out order)) { continue; }
-                _orders.Add(order);
-                _orderLayers.Add(l);
-            }
-            if(_orders.Count == 0) { _orders = null; return; }
-            _orders.Sort();
-            _orderLayers.Sort((a, b) => Int32.Parse(a.Name).CompareTo(Int32.Parse(b.Name)));
-            //CaptureChanged?.Invoke(null, null);
-        }
-
-        internal static CameraState GetCaptureData(int order)
+        protected void Regen()
         {
-            if (!Captures.Contains(order)) { return null; }
-            int idx = Captures.IndexOf(order);
-            var objs = Rhino.RhinoDoc.ActiveDoc.Objects.FindByLayer(_orderLayers[idx]);
-            CameraState output = new CameraState();
-            foreach(var o in objs)
-            {
-                if (o.Name.Contains(POINTNAME_CAMERALOCATION))
-                {
-                    double focalLength = RhinoAppMappings.ActiveViewport.Camera35mmLensLength;
-                    double.TryParse(o.Name.Split('_').Last(), out focalLength);
-                    output.FocalLengthState = focalLength;
-                    output.PositionState = (o.Geometry as Point).Location;
-                }
-                else if (o.Name.Contains(POINTNAME_CAMERATARGET))
-                {
-                    output.TargetPositionState = (o.Geometry as Point).Location;
-                }
-            }
-            return output;
-        }
+            Layer parent = LayerStorageManager.GetOrCreateLayerAtPath(BasePath);
 
-        public static void CreateNewCapture(int order, Point3d cameraLocation = default(Point3d), Point3d cameraTarget = default(Point3d))
-        {
-            Layer l = null;
-            int lyrIndex = -1;
-            if (Captures.Contains(order))
+            if (parent != null)
             {
-                // Clear geometry from order
-                ClearCaptureData(order, out l);
-                lyrIndex = l.Index;
+                var output = parent.GetChildrenSafe().Select(l => (int.TryParse(l.Name, out var i) ? i : -1, LayerStorageManager.Load(l))).ToList();
+                _captures = output
+                    .Where(c => c.Item1 != -1)
+                    .ToDictionary(c => c.Item1, c => c.Item2);
             }
             else
             {
-                // Create order layers
-                l = new Layer() {
-                    Name = order.ToString(),
-                    IsVisible = false,
-                    //IsLocked = true,
-                    ParentLayerId = _orderLayersParent.Id
-                };
-                lyrIndex = Rhino.RhinoDoc.ActiveDoc.Layers.Add(l);
-                l.ParentLayerId = _orderLayersParent.Id;
-                RegenCaptureData();
+                _captures = new Dictionary<int, LayerStoragePayload>();
             }
-            if(cameraLocation == default(Point3d))
-            {
-                cameraLocation = RhinoAppMappings.ActiveViewport.CameraLocation;
-            }
-            if(cameraTarget == default(Point3d))
-            {
-                cameraTarget = RhinoAppMappings.ActiveViewport.CameraTarget;
-            }
-
-            // get layer index
-
-            // Create objects
-            Rhino.RhinoDoc.ActiveDoc.Objects.AddPoint(
-                cameraLocation, 
-                new ObjectAttributes() { 
-                    LayerIndex = lyrIndex, 
-                    Name = POINTNAME_CAMERALOCATION + "_" + RhinoAppMappings.ActiveViewport.Camera35mmLensLength });
-            Rhino.RhinoDoc.ActiveDoc.Objects.AddPoint(
-                cameraTarget, 
-                new ObjectAttributes() { 
-                    LayerIndex = lyrIndex, 
-                    Name = POINTNAME_CAMERATARGET });
-
-            // donezo
         }
 
-        public static bool ClearCaptureData(int order, out Layer layer)
+        public void CreateNewCapture(int order, T data)
         {
-            layer = null;
-            if (!_orders.Contains(order)) { return false; }
-            layer = _orderLayers[_orders.IndexOf(order)];
-            var objectsToDelete = Rhino.RhinoDoc.ActiveDoc.Objects.FindByLayer(layer);
-            foreach(var o in objectsToDelete)
+            CreateCapture(order, data);
+            Regen();
+        }
+        protected abstract void CreateCapture(int order, T data);
+
+        protected void ClearAllCaptureData()
+        {
+            var layersToClear = _captures.Select(c => c.Value.Layer).ToHashSet();
+
+            foreach(var l in layersToClear)
             {
-                Rhino.RhinoDoc.ActiveDoc.Objects.Delete(o);
+                var objectsToDelete = RhinoAppMappings.ActiveDoc.Objects.FindByLayer(l);
+                foreach (var o in objectsToDelete)
+                {
+                    RhinoAppMappings.ActiveDoc.Objects.Delete(o);
+                }
             }
+            _captures.Clear();
+            Regen();
+        }
+
+        protected bool ClearCaptureData(int order, out Layer layer)
+        {
+            if (!_captures.ContainsKey(order)) { layer = null; return false; }
+            Layer l = _captures[order].Layer;
+
+            var objectsToDelete = RhinoAppMappings.ActiveDoc.Objects.FindByLayer(l);
+            foreach (var o in objectsToDelete)
+            {
+                RhinoAppMappings.ActiveDoc.Objects.Delete(o);
+            }
+            layer = l;
+            _captures.Remove(order);
             return true;
         }
-
     }
 }

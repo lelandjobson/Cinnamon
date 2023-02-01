@@ -19,7 +19,7 @@ namespace Cinnamon.Components.Create
         public CreateScene()
           : base("CreateScene", "CreateScene",
             "Creates a scene from moments",
-            "Cinnamon", "2_Build")
+            "Cinnamon", "3_Build")
         {
         }
 

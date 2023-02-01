@@ -24,7 +24,7 @@ namespace Cinnamon.Components.Capture
         public PreviewCapture()
           : base("PreviewCapture", "PreviewCapture",
             "Previews an object Capture from the document",
-            "Cinnamon", "0_Capture")
+            "Cinnamon", "1_Capture")
         {
         }
 
@@ -37,6 +37,7 @@ namespace Cinnamon.Components.Capture
             pManager.AddIntegerParameter("Capture", "Capture", "The number of the Capture to preview", GH_ParamAccess.item);
 
             pManager[0].Optional = true;
+            pManager[1].Optional = true;
         }
 
 
@@ -52,6 +53,8 @@ namespace Cinnamon.Components.Capture
         /// </summary>
         /// <param name="DA">The DA object can be used to retrieve data from input parameters and 
         /// to store data in output parameters.</param>
+        /// 
+
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             this.Message = string.Empty;
@@ -81,25 +84,35 @@ namespace Cinnamon.Components.Capture
                 }
             }
             #endregion
-            if (!DA.GetData(1, ref Capture)){ return; }
+            if (!DA.GetData(1, ref Capture)){
+                DisplayConduitManager.HideMessage(2);
+                return; 
+            }
             if (string.IsNullOrEmpty(objectId))
             {
                 // camera
-                Player.MainPlayer.RenderCameraState(CaptureManager_Camera.GetCaptureData(Capture));
+                Player.DefaultPlayer.RenderCameraState(CameraCaptureManager.Default.GetCaptureData(Capture));
                 this.Message = "Rendering Camera";
+                DisplayConduitManager.RenderMessage(2, "Warning: Preview Is Active!");
                 return;
             }
-            if(!Guid.TryParse(objectId, out Guid gid)) { return; }
+            if(!Guid.TryParse(objectId, out Guid gid)) {
+                DisplayConduitManager.HideMessage(2);
+                return; 
+            }
 
-            if (!Document_CaptureManagers.ContainsCapture(gid))
+            if (!DocumentCaptureManagers.ContainsCapture(gid))
             {
                 this.Message = "No Captures found in the document for this object";
+                DisplayConduitManager.HideMessage(2);
                 return;
             }
 
-            var objState = Document_CaptureManagers.GetOrCreateCaptureManager(gid).GetCaptureData(Capture);
+            if(!DocumentCaptureManagers.TryGetOrCreateObjectCaptureManager(gid, out var objState)) { this.Message = "unable to render object"; return; }
+            
             this.Message = "Rendering Object";
-            Player.MainPlayer.RenderObjectState(objState);
+            DisplayConduitManager.RenderMessage(2, "Warning: Preview Is Active!");
+            Player.DefaultPlayer.RenderObjectState(objState.GetCaptureData(Capture));
         }
 
         /// <summary>

@@ -22,7 +22,7 @@ namespace Cinnamon.Components.Create
         public Animate_MoveObjectOnCurveEffect()
           : base("MoveObjectOnCurve", "MoveObjectOnCurve",
             "Moves an object along a curve",
-            "Cinnamon", "1_Animate")
+            "Cinnamon", "2_Animate")
         {
         }
 

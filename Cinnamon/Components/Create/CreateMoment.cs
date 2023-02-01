@@ -21,7 +21,7 @@ namespace Cinnamon.Components.Create
         public CreateMoment()
           : base("CreateMoment", "CreateMoment",
             "Creates a moment from effects",
-            "Cinnamon", "2_Build")
+            "Cinnamon", "3_Build")
         {
         }
 

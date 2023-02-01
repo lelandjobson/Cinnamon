@@ -13,41 +13,26 @@ namespace Cinnamon
     {
         //public static Guid Id_ActiveViewportCamera = new Guid("81B69A70-7F24-4D65-9F50-83B14A1570F8");
 
-        public static LayerTable DocumentLayers => Rhino.RhinoDoc.ActiveDoc.Layers;
+        public static LayerTable DocumentLayers => RhinoAppMappings.ActiveDoc.Layers;
 
         public static RhinoObject[] ObjectsOnLayer(Layer l) =>
-            Rhino.RhinoDoc.ActiveDoc.Objects.FindByLayer(l);
+            RhinoAppMappings.ActiveDoc.Objects.FindByLayer(l);
         
 
-        public static string ForceView
-        {
-            get => _forceView;
-            set
-            {
-                if(_forceView != value)
-                {
-                    _forceView = value;
-                }
-            }
-        }
-        private static string _forceView = String.Empty;
 
         public static RhinoViewport ActiveViewport => ActiveView.ActiveViewport;
+
+        public static Rhino.RhinoDoc ActiveDoc => Rhino.RhinoDoc.ActiveDoc;
 
         public static RhinoView ActiveView
         {
             get
             {
-                if(_forceView != null)
-                {
-                    return Rhino.RhinoDoc.ActiveDoc.Views.FirstOrDefault(v => v.ActiveViewport.Name.Equals(_forceView)) ??
-                       //Rhino.RhinoDoc.ActiveDoc.NamedViews.FirstOrDefault(v => v.Name.Equals(_forceView, StringComparison.OrdinalIgnoreCase)) ??
-                           Rhino.RhinoDoc.ActiveDoc.Views.ActiveView;
-                }
-                else
-                {
-                    return Rhino.RhinoDoc.ActiveDoc.Views.ActiveView;
-                }
+                return RhinoAppMappings.ActiveDoc.Views.ActiveView;
+            }
+            set
+            {
+                RhinoAppMappings.ActiveDoc.Views.ActiveView = value;
             }
         }
 

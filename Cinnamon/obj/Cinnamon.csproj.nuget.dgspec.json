@@ -44,6 +44,10 @@
               "include": "Compile, Build",
               "target": "Package",
               "version": "[6.35.21222.17001, )"
+            },
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[13.0.2, )"
             }
           },
           "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.100\\RuntimeIdentifierGraph.json"

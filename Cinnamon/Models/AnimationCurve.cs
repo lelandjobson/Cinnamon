@@ -1,5 +1,6 @@
 ﻿namespace Cinnamon.Models
 {
+
     public enum AnimationCurve
     {
         //Null = -1,

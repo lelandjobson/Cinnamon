@@ -20,11 +20,9 @@ namespace Cinnamon.Components.Capture
         public NextCapture()
           : base("NextCapture", "NextCapture",
             "Provides the next Capture",
-            "Cinnamon", "0_Capture")
+            "Cinnamon", "1_Capture")
         {
         }
-
-        private static int _Capture = 0;
 
         /// <summary>
         /// Registers all the input parameters for this component.
@@ -81,16 +79,19 @@ namespace Cinnamon.Components.Capture
             if (string.IsNullOrEmpty(objectId))
             {
                 // camera
-                this.Message = $"Camera: {CaptureManager_Camera.Next}";
-                DA.SetData(0, CaptureManager_Camera.Next);
+                this.Message = $"Camera: {CameraCaptureManager.Default.NextCaptureKey}";
+                DA.SetData(0, CameraCaptureManager.Default.NextCaptureKey);
                 return;
             }
             if(!Guid.TryParse(objectId, out Guid gId)) { return; }
             //this.Message = "Object";
-            var omg = Document_CaptureManagers.GetOrCreateCaptureManager(gId);
+            if (!DocumentCaptureManagers.TryGetOrCreateObjectCaptureManager(gId, out var omg))
+            {
+                throw new Exception("Could not animate object.");
+            }
             //_Capture = omg.Next;
-            this.Message = $"Object: {omg.Next}";
-            DA.SetData(0, omg.Next);
+            this.Message = $"Object: {omg.NextCaptureKey}";
+            DA.SetData(0, omg.NextCaptureKey);
         }
 
         /// <summary>

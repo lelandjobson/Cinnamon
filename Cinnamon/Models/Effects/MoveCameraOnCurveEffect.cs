@@ -53,13 +53,14 @@ namespace Cinnamon.Models.Effects
 
         public void SetFrameStateValue(double percentage, FrameState state)
         {
-            if(CameraCurve != null)
+            if (state.CameraState == null) { state.CameraState = DocumentBaseState.GetActiveCameraState(); }
+            if (CameraCurve != null)
             {
-                state.CameraState.PositionState = GetValue(CameraCurve,percentage);
+                state.CameraState.Position = GetValue(CameraCurve,percentage);
             }
             if(TargetCurve != null)
             {
-                state.CameraState.TargetPositionState = GetValue(TargetCurve,percentage);
+                state.CameraState.Target = GetValue(TargetCurve,percentage);
             }
         }
     }

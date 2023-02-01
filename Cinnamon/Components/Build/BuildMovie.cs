@@ -21,7 +21,7 @@ namespace Cinnamon.Components.Create
         public BuildMovie()
           : base("BuildMovie", "BuildMovie",
             "Builds a movie from scenes",
-            "Cinnamon", "2_Build")
+            "Cinnamon", "3_Build")
         {
         }
 

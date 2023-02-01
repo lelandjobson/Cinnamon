@@ -2,7 +2,7 @@
 
 namespace Cinnamon.Models.Effects
 {
-    public interface IEffect
+    public interface IEffect : ICanUseInPlayer
     { 
         Guid Id { get; }
 

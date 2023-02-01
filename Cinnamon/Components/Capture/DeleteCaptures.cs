@@ -1,4 +1,5 @@
-﻿using Cinnamon.Models;
+﻿using Cinnamon.Components.Capture.Managers;
+using Cinnamon.Models;
 using Grasshopper;
 using Grasshopper.Kernel;
 using Grasshopper.Kernel.Data;
@@ -10,7 +11,7 @@ using System.Collections.Generic;
 namespace Cinnamon.Components.Capture
 {
 
-    public class SavedCaptures : GH_Component
+    public class DeleteCaptures : GH_Component
     {
         /// <summary>
         /// Each implementation of GH_Component must provide a public 
@@ -19,9 +20,9 @@ namespace Cinnamon.Components.Capture
         /// Subcategory the panel. If you use non-existing tab or panel names, 
         /// new tabs/panels will automatically be created.
         /// </summary>
-        public SavedCaptures()
-          : base("SavedCaptures", "SavedCaptures",
-            "Loads saved captures from the document",
+        public DeleteCaptures()
+          : base("DeleteCaptures", "DeleteCaptures",
+            "Deletes saved captures from the document",
             "Cinnamon", "1_Capture")
         {
         }
@@ -32,7 +33,9 @@ namespace Cinnamon.Components.Capture
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddGenericParameter("Object", "Object", "The object. If blank, uses the camera instead.", GH_ParamAccess.item);
-            pManager.AddBooleanParameter("Reset", "Reset", "Recalculates. Have this plugged into your capture button.", GH_ParamAccess.item);
+            pManager.AddIntegerParameter("CaptureIds", "CaptureIds", "The captures to delete.", GH_ParamAccess.list);
+            pManager.AddBooleanParameter("Delete", "Delete", "Deletes the CaptureIds provided in the CaptureIds parameter.", GH_ParamAccess.item, false);
+            pManager.AddBooleanParameter("DeleteAll", "DeleteAll", "Deletes all captures for this if hit.", GH_ParamAccess.item, false);
 
             pManager[0].Optional = true;
         }
@@ -42,7 +45,6 @@ namespace Cinnamon.Components.Capture
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddIntegerParameter("Captures", "Captures", "Captures found in the document", GH_ParamAccess.list);
         }
 
         /// <summary>
@@ -77,26 +79,57 @@ namespace Cinnamon.Components.Capture
                 }
             }
             #endregion
-            if (string.IsNullOrEmpty(objectId))
-            {
-                // Camera
-                this.Message = "Camera";
-                DA.SetDataList(0, CameraCaptureManager.Default.CaptureKeys);
-                return;
-            }
-            if (!Guid.TryParse(objectId, out var objectIdGuid)) { return; }
 
-            //if (!Document_CaptureManagers.ContainsCapture(objectIdGuid)) { this.Message = "Could not find Captures \n for that object."; return; }
-            this.Message = "Object";
+            //List<int> captures = new List<int>();
+            //DA.GetDataList(1, captures);
+            //bool delete = false;
+            //DA.GetData(2, ref delete);
+            //bool deleteAll = false;
+            //DA.GetData(3, ref deleteAll);
 
-            if(!DocumentCaptureManagers.TryGetOrCreateObjectCaptureManager(objectIdGuid, out var capMap))
-            {
-                DA.SetDataList(0, new List<int>());
-            }
-            else
-            {
-                DA.SetDataList(0, capMap.CaptureKeys ?? new List<int>());
-            }
+            //bool success = false;
+            //if (string.IsNullOrEmpty(objectId))
+            //{
+            //    // Camera
+            //    if (deleteAll)
+            //    {
+            //        foreach(var c in CaptureManager_Camera.Captures)
+            //        {
+            //            success = CaptureManager_Camera.ClearCaptureData(c, out var l) || success;
+            //            CaptureManager_Camera.DeleteLayer(l);
+            //        }    
+            //    }
+            //    else if(captures == null || captures.Count == 0 || !delete) { return; }
+            //    else {
+            //        foreach(var c in captures)
+            //        {
+            //            success = CaptureManager_Camera.ClearCaptureData(c, out var l) || success;
+            //            CaptureManager_Camera.DeleteLayer(l);
+            //        }
+            //    }
+            //}
+            //else if (Guid.TryParse(objectId, out var objectIdGuid))
+            //{
+            //    if(!Document_CaptureManagers.TryGetOrCreateCaptureManager(objectIdGuid, out var capManager)) { return; }
+
+            //    if (deleteAll)
+            //    {
+            //        foreach (var c in CaptureManager_Camera.Captures)
+            //        {
+            //            success = capManager.ClearCaptureData(c, out var l) || success;
+            //            LayerStorageManager.DeleteLayer(l);
+            //        }
+            //    }
+            //    else if (captures == null || captures.Count == 0 || !delete) { return; }
+            //    else
+            //    {
+            //        foreach (var c in captures)
+            //        {
+            //            success = capManager.ClearCaptureData(c, out var l) || success;
+            //            LayerStorageManager.DeleteLayer(l);
+            //        }
+            //    }
+            //}
         }
 
         /// <summary>
@@ -112,6 +145,6 @@ namespace Cinnamon.Components.Capture
         /// It is vital this Guid doesn't change otherwise old ghx files 
         /// that use the old ID will partially fail during loading.
         /// </summary>
-        public override Guid ComponentGuid => new Guid("C655BA31-752A-4FE5-896F-1D8D8B1A153C");
+        public override Guid ComponentGuid => new Guid("C115BA31-752A-4AA5-896F-1D8D8B1A153C");
     }
 }

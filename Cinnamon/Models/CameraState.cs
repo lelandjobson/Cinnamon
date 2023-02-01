@@ -8,14 +8,45 @@ namespace Cinnamon.Models
     /// view camera necessary for the app
     /// </summary>
     [Serializable]
-    public class CameraState
+    public class CameraState : ObjectOrientationState
     {
+        public Point3d Position
+        {
+            get => A;
+            set => A = value;
+        }
 
-        public Point3d PositionState = Point3d.Unset;
+        public Point3d Target
+        {
+            get => B;
+            set => B = value;   
+        }
 
-        public Point3d TargetPositionState = Point3d.Unset;
+        public double FocalLength = 35;
 
-        public double FocalLengthState = -1;
+        public CameraState(Point3d cameraLocation, Point3d cameraTarget, double focalLength = -1) : base(Guid.Empty, new[] {cameraLocation,cameraTarget})
+        {
+            FocalLength = focalLength;
+        }
 
+        public override void Apply()
+        {
+            if (!double.IsNaN(FocalLength))
+            {
+                DocumentBaseState.ActiveBase.Viewport.Camera35mmLensLength = FocalLength;
+            }
+            if (Position != Point3d.Unset && Target != Point3d.Unset)
+            {
+                DocumentBaseState.ActiveBase.Viewport.SetCameraLocations(Target, Position);
+            }
+            else if (Position == Point3d.Unset && Target != Point3d.Unset)
+            {
+                DocumentBaseState.ActiveBase.Viewport.SetCameraTarget(Target, false);
+            }
+            else if (Position != Point3d.Unset && Target == Point3d.Unset)
+            {
+                DocumentBaseState.ActiveBase.Viewport.SetCameraLocation(Position, false);
+            }
+        }
     }
 }
