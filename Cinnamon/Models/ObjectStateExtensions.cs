@@ -3,6 +3,7 @@ using Rhino.Geometry;
 using Rhino.Geometry.Collections;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Cinnamon.Models
 {
@@ -41,7 +42,9 @@ namespace Cinnamon.Models
                 case ObjectType.PointSet:
                     if (ro.Geometry is PointCloud pcs)
                     {
-                       
+                       // Grab random 3 points
+                       if(pcs.Count < 3) { return false; }
+                        orientation = new ThreePointObjectOrientationState(ro.Id, pcs[0].Location, pcs[pcs.Count / 2].Location, pcs[pcs.Count - 1].Location);
                     }
                     break;
                 case ObjectType.Surface:
@@ -59,14 +62,36 @@ namespace Cinnamon.Models
                     }
                     break;
                 case ObjectType.Mesh:
+                    if(ro.Geometry is Mesh mesh)
+                    {
+                        // Grab random 3 points
+                        if (mesh.Vertices.Count < 3) { return false; }
+                        orientation = new ThreePointObjectOrientationState(ro.Id, mesh.Vertices[0], mesh.Vertices[mesh.Vertices.Count / 2], mesh.Vertices[mesh.Vertices.Count - 1]);
+                        return true;
+                    }
                     break;
                 case ObjectType.Light:
                     break;
                 case ObjectType.Annotation:
+                    if(ro.Geometry is AnnotationBase annotation)
+                    {
+                        orientation = new ThreePointObjectOrientationState(ro.Id, annotation.Plane.GetOrientationPoints().ToArray());
+                        return true;
+                    }
                     break;
                 case ObjectType.InstanceDefinition:
                     break;
                 case ObjectType.InstanceReference:
+                    //if (ro.Geometry is InstanceReferenceGeometry instance)
+                    //{
+                    //    var o = Point3d.Origin;
+                    //    o.Transform(instance.Xform);
+                    //    var x = Vector3d.XAxis;
+                    //    x.Transform(instance.Xform);
+                    //    var y = Vector3d.YAxis;
+                    //    y.Transform(instance.Xform);
+                    //    orientation = new ThreePointObjectOrientationState(ro.Id, o,x,y);
+                    //}
                     break;
                 case ObjectType.TextDot:
                     break;
@@ -75,6 +100,22 @@ namespace Cinnamon.Models
                 case ObjectType.Detail:
                     break;
                 case ObjectType.Hatch:
+                    if(ro.Geometry is Hatch hat)
+                    {
+                        var curveBoundaryPoints = hat.Get3dCurves(true).Select(hCurve => hCurve.PointAtStart).Distinct().ToList();
+                        if (curveBoundaryPoints.Count < 3)
+                        {
+                            orientation = new SinglePointObjectOrientationState(ro.Id, curveBoundaryPoints[0]);
+                        }
+                        else if (curveBoundaryPoints.Count >= 3)
+                        {
+                            orientation = new ThreePointObjectOrientationState(ro.Id, curveBoundaryPoints[0], curveBoundaryPoints[1], curveBoundaryPoints[2]);
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
                     break;
                 case ObjectType.MorphControl:
                     break;
@@ -95,13 +136,19 @@ namespace Cinnamon.Models
                 case ObjectType.MeshFace:
                     break;
                 case ObjectType.Cage:
+                    if(ro.Geometry is MorphControl control)
+                    {
+                        orientation = new ThreePointObjectOrientationState(ro.Id, GetOrientationPoints(control.Curve).ToArray());
+                        return true;   
+                    }
                     break;
                 case ObjectType.Phantom:
                     break;
                 case ObjectType.ClipPlane:
                     if(ro.Geometry is ClippingPlaneSurface clip)
                     {
-
+                        orientation = new ThreePointObjectOrientationState(ro.Id, clip.Plane.GetOrientationPoints().ToArray());
+                        return true;
                     }
                     break;
                 case ObjectType.Extrusion:
