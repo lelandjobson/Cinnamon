@@ -17,7 +17,7 @@ namespace Cinnamon.Components.Capture.Managers
     {
         private const string CinnamonLayerRootName = "Cinnamon_Gh";
 
-        private static LayerTable _rhlyrs => Rhino.RhinoDoc.ActiveDoc.Layers;
+        private static LayerTable _rhlyrs => RhinoAppMappings.ActiveDoc.Layers;
         private static Layer _cinnamonParentLayer
         {
             get
@@ -40,7 +40,7 @@ namespace Cinnamon.Components.Capture.Managers
             }
         }
 
-        public static void DeleteLayer(Layer layer) => Rhino.RhinoDoc.ActiveDoc.Layers.Delete(layer);
+        public static void DeleteLayer(Layer layer) => RhinoAppMappings.ActiveDoc.Layers.Delete(layer);
 
 
         public static LayerStoragePayload ReadPayload(string path)
@@ -61,7 +61,7 @@ namespace Cinnamon.Components.Capture.Managers
         public static LayerStoragePayload Load(Layer layer)
         {
             Dictionary<string, Point3d> payloadData = new Dictionary<string, Point3d>(StringComparer.OrdinalIgnoreCase);
-            var objs = Rhino.RhinoDoc.ActiveDoc.Objects.FindByLayer(layer);
+            var objs = RhinoAppMappings.ActiveDoc.Objects.FindByLayer(layer);
             foreach(var obj in objs)
             {
                 if (payloadData.ContainsKey(obj.Name)) { continue; }
@@ -81,7 +81,7 @@ namespace Cinnamon.Components.Capture.Managers
             foreach (var point in payload.Points)
             {
                 // Create objects
-                Rhino.RhinoDoc.ActiveDoc.Objects.AddPoint(
+                RhinoAppMappings.ActiveDoc.Objects.AddPoint(
                     point.Value,
                     new ObjectAttributes()
                     {
@@ -102,7 +102,7 @@ namespace Cinnamon.Components.Capture.Managers
                 for(int i = 0; i < pathPieces.Length; i++)
                 {
                     string curLayer = pathPieces[i];
-                    Layer existingLayer = parent.GetChildren().FirstOrDefault(l => l.Name.Equals(curLayer, StringComparison.OrdinalIgnoreCase));
+                    Layer existingLayer = parent.GetChildrenSafe().FirstOrDefault(l => l.Name.Equals(curLayer, StringComparison.OrdinalIgnoreCase));
                     if(existingLayer != null)
                     {
                         parent = existingLayer;
@@ -117,9 +117,9 @@ namespace Cinnamon.Components.Capture.Managers
                             //IsLocked = true,
                             ParentLayerId = parent.Id
                         };
-                        int lyrIndex = Rhino.RhinoDoc.ActiveDoc.Layers.Add(l);
+                        int lyrIndex = RhinoAppMappings.ActiveDoc.Layers.Add(l);
                         l.ParentLayerId = parent.Id;
-                        parent = l;
+                        parent = RhinoAppMappings.ActiveDoc.Layers[lyrIndex];
                     }
                 }
                 return parent;
@@ -137,10 +137,10 @@ namespace Cinnamon.Components.Capture.Managers
                 Layer layer = payload.Layer;
                 if (clearPrevious)
                 {
-                    var objectsToDelete = Rhino.RhinoDoc.ActiveDoc.Objects.FindByLayer(layer);
+                    var objectsToDelete = RhinoAppMappings.ActiveDoc.Objects.FindByLayer(layer);
                     foreach (var o in objectsToDelete)
                     {
-                        Rhino.RhinoDoc.ActiveDoc.Objects.Delete(o);
+                        RhinoAppMappings.ActiveDoc.Objects.Delete(o);
                     }
                 }
                 WritePayload(payload);

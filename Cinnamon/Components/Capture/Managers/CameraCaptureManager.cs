@@ -7,12 +7,13 @@ using System.Linq;
 
 namespace Cinnamon.Components.Capture
 {
-    public class CaptureManager_Camera : CaptureManager<CameraState>
+    public class CameraCaptureManager : CaptureManager<CameraState>
     {
-
+        public static CameraCaptureManager Default => _default ?? (_default = new CameraCaptureManager());
+        private static CameraCaptureManager _default;
         protected override string BasePath => "CameraState";
 
-        public CaptureManager_Camera()
+        public CameraCaptureManager()
         {
         }
 
@@ -54,8 +55,8 @@ namespace Cinnamon.Components.Capture
 
             LayerStorageManager.Store(new LayerStoragePayload(layer, new System.Collections.Generic.Dictionary<string, Rhino.Geometry.Point3d>()
             {
-                { $"{POINTNAME_CAMERALOCATION}_{data.FocalLengthState}", data.PositionState},
-                { $"{POINTNAME_CAMERATARGET}_{data.FocalLengthState}", data.TargetPositionState},
+                { $"{POINTNAME_CAMERALOCATION}_{data.FocalLength}", data.Position},
+                { $"{POINTNAME_CAMERATARGET}_{data.FocalLength}", data.Target},
             }));
 
         }

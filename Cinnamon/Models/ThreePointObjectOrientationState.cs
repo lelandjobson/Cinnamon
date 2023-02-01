@@ -22,7 +22,7 @@ namespace Cinnamon.Models
             }
             var xform = Transform.PlaneToPlane(oldState.Plane, this.Plane);
             //ro.Geometry.Transform(xform);
-            Rhino.RhinoDoc.ActiveDoc.Objects.Transform(Id, xform, true);
+            RhinoAppMappings.ActiveDoc.Objects.Transform(Id, xform, true);
         }
     }
 }

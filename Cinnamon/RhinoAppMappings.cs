@@ -13,24 +13,26 @@ namespace Cinnamon
     {
         //public static Guid Id_ActiveViewportCamera = new Guid("81B69A70-7F24-4D65-9F50-83B14A1570F8");
 
-        public static LayerTable DocumentLayers => Rhino.RhinoDoc.ActiveDoc.Layers;
+        public static LayerTable DocumentLayers => RhinoAppMappings.ActiveDoc.Layers;
 
         public static RhinoObject[] ObjectsOnLayer(Layer l) =>
-            Rhino.RhinoDoc.ActiveDoc.Objects.FindByLayer(l);
+            RhinoAppMappings.ActiveDoc.Objects.FindByLayer(l);
         
 
 
         public static RhinoViewport ActiveViewport => ActiveView.ActiveViewport;
 
+        public static Rhino.RhinoDoc ActiveDoc => Rhino.RhinoDoc.ActiveDoc;
+
         public static RhinoView ActiveView
         {
             get
             {
-                return Rhino.RhinoDoc.ActiveDoc.Views.ActiveView;
+                return RhinoAppMappings.ActiveDoc.Views.ActiveView;
             }
             set
             {
-                Rhino.RhinoDoc.ActiveDoc.Views.ActiveView = value;
+                RhinoAppMappings.ActiveDoc.Views.ActiveView = value;
             }
         }
 

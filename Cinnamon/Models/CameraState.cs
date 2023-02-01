@@ -10,36 +10,43 @@ namespace Cinnamon.Models
     [Serializable]
     public class CameraState : ObjectOrientationState
     {
-
-        public Point3d PositionState = Point3d.Unset;
-
-        public Point3d TargetPositionState = Point3d.Unset;
-
-        public double FocalLengthState = -1;
-
-        public CameraState(Point3d cameraLocation, Point3d cameraTarget, double focalLengthState = -1) : base(Guid.Empty, new[] {cameraLocation,cameraTarget})
+        public Point3d Position
         {
-            if (cameraLocation == default(Point3d))
-            {
-                PositionState = RhinoAppMappings.ActiveViewport.CameraLocation;
-            }
-            if (cameraTarget == default(Point3d))
-            {
-                TargetPositionState = RhinoAppMappings.ActiveViewport.CameraTarget;
-            }
-            if(focalLengthState == -1)
-            {
-                FocalLengthState = RhinoAppMappings.ActiveViewport.Camera35mmLensLength;
-            }
+            get => A;
+            set => A = value;
         }
 
-        public CameraState(params Point3d[] points) : base(Guid.Empty, points)
+        public Point3d Target
         {
+            get => B;
+            set => B = value;   
+        }
+
+        public double FocalLength = 35;
+
+        public CameraState(Point3d cameraLocation, Point3d cameraTarget, double focalLength = -1) : base(Guid.Empty, new[] {cameraLocation,cameraTarget})
+        {
+            FocalLength = focalLength;
         }
 
         public override void Apply()
         {
-            throw new NotImplementedException();
+            if (!double.IsNaN(FocalLength))
+            {
+                DocumentBaseState.ActiveBase.Viewport.Camera35mmLensLength = FocalLength;
+            }
+            if (Position != Point3d.Unset && Target != Point3d.Unset)
+            {
+                DocumentBaseState.ActiveBase.Viewport.SetCameraLocations(Target, Position);
+            }
+            else if (Position == Point3d.Unset && Target != Point3d.Unset)
+            {
+                DocumentBaseState.ActiveBase.Viewport.SetCameraTarget(Target, false);
+            }
+            else if (Position != Point3d.Unset && Target == Point3d.Unset)
+            {
+                DocumentBaseState.ActiveBase.Viewport.SetCameraLocation(Position, false);
+            }
         }
     }
 }

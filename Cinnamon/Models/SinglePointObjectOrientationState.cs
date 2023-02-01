@@ -16,7 +16,7 @@ namespace Cinnamon.Models
             // Single point orientation
             var rhObj = Id.ToDocumentObject();
             var vec = PositionState - rhObj.ToBBPoint();
-            Rhino.RhinoDoc.ActiveDoc.Objects.Transform(rhObj.Id, Transform.Translation(vec), true);
+            RhinoAppMappings.ActiveDoc.Objects.Transform(rhObj.Id, Transform.Translation(vec), true);
         }
     }
 }

@@ -94,41 +94,35 @@ namespace Cinnamon.Components.Create
                 // Camera motion effect
                 Curve loc;
                 Curve target;
-                List<CameraState> states = Captures.Select(o => CaptureManager_Camera.GetCaptureData(o)).ToList();
+                List<CameraState> states = Captures.Select(o => CameraCaptureManager.Default.GetCaptureData(o)).ToList();
                 if(states.Count < 2) { throw new Exception("2 or more captures are required to produce an effect."); }
                 if (!interp)
                 {
-                    loc = new PolylineCurve(states.Select(s => s.PositionState));
-                    target = new PolylineCurve(states.Select(s => s.TargetPositionState));
+                    loc = new PolylineCurve(states.Select(s => s.Position));
+                    target = new PolylineCurve(states.Select(s => s.Target));
                     // polylin
                 }
                 else
                 {
-                    loc = Curve.CreateInterpolatedCurve(states.Select(s => s.PositionState),3);
-                    target = Curve.CreateInterpolatedCurve(states.Select(s => s.TargetPositionState), 3);
+                    loc = Curve.CreateInterpolatedCurve(states.Select(s => s.Position),3);
+                    target = Curve.CreateInterpolatedCurve(states.Select(s => s.Target), 3);
                 }
                 effectsOutput.Add(new MoveCameraOnCurveEffect(loc, target));
-                effectsOutput.Add(new FocalLengthEffect(states.Select(s => s.FocalLengthState)));
+                effectsOutput.Add(new FocalLengthEffect(states.Select(s => s.FocalLength)));
             }
             else
             {
                 if (!Guid.TryParse(objectId, out objectIdGuid)) { return; }
                 // Object motion effect
-                Curve movement;
-                if(!Document_CaptureManagers.TryGetOrCreateCaptureManager(objectIdGuid, out var omg))
+                if(!DocumentCaptureManagers.TryGetOrCreateObjectCaptureManager(objectIdGuid, out var omg))
                 {
                     throw new Exception("Could not animate object.");
                 }
                 List<ObjectOrientationState> states = Captures.Select(o => omg.GetCaptureData(o)).ToList();
                 if (states.Count < 2) { throw new Exception("2 or more captures are required to produce an effect."); }
-                if (!interp)
-                {
-                    movement = new PolylineCurve(states.Select(s => s.A));
-                }
-                else
-                {
-                    movement = Curve.CreateInterpolatedCurve(states.Select(s => s.A), 3);
-                }
+
+                OrientableMovementCurve movement = new OrientableMovementCurve(states, interp);
+
                 effectsOutput.Add(new MoveObjectWithCapturesEffect(objectIdGuid, movement));
             }
 

@@ -39,7 +39,7 @@ namespace Cinnamon.Models.Effects
         {
             if(FocalLengthStates.Count == 2)
             {
-                state.CameraState.FocalLengthState = percentage.PercToValue(FocalLengthStates[0], FocalLengthStates[1]);
+                state.CameraState.FocalLength = percentage.PercToValue(FocalLengthStates[0], FocalLengthStates[1]);
             }
             else
             {
@@ -48,7 +48,7 @@ namespace Cinnamon.Models.Effects
                 if(lower == FocalLengthStates.Count - 1) { lower--; }
                 int upper = lower + 1;
                 mapped -= lower;
-                state.CameraState.FocalLengthState = mapped.PercToValue(FocalLengthStates[lower], FocalLengthStates[upper]);
+                state.CameraState.FocalLength = mapped.PercToValue(FocalLengthStates[lower], FocalLengthStates[upper]);
             }
         }
     }

@@ -34,6 +34,7 @@ namespace Cinnamon.Components.Base
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddBooleanParameter("Reset", "Reset", "Resets the base state of the document", GH_ParamAccess.item);
+            pManager[0].Optional = true;
         }
 
 

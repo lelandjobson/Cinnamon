@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Cinnamon.Components.Capture;
+using Newtonsoft.Json;
 using Rhino;
 using System;
 using System.Collections.Generic;
@@ -46,12 +47,40 @@ namespace Cinnamon.Models
                 if(_activeBase == null)
                 {
                     LoadOrCreateBaseState();
+                    SubscribeToDocEvents();
                 }
                 return _activeBase;
             }
             set {
                 _activeBase = value;
             } 
+        }
+
+        private static void SubscribeToDocEvents()
+        {
+            RhinoAppMappings.ActiveDoc.AddCustomUndoEvent("Favorite Number", OnUndo);
+        }
+
+        // event handler for custom undo
+        static void OnUndo(object sender, Rhino.Commands.CustomUndoEventArgs e)
+        {
+            // !!!!!!!!!!
+            // NEVER change any setting in the Rhino document or application.  Rhino
+            // handles ALL changes to the application and document and you will break
+            // the Undo/Redo commands if you make any changes to the application or
+            // document. This is meant only for your own private plug-in data
+            // !!!!!!!!!!
+
+            // On Undo we want to regen our document
+            // capture objects from the document.
+            DocumentCaptureManagers.RegenAll();
+
+            // This function can be called either by undo or redo
+            // In order to get redo to work, add another custom undo event with the
+            // current value.  If you don't want redo to work, just skip adding
+            // a custom undo event here
+            e.Document.AddCustomUndoEvent("Cinnamon Undo", OnUndo);
+
         }
 
         private static void LoadOrCreateBaseState()
@@ -75,6 +104,8 @@ namespace Cinnamon.Models
             Notify();
         }
 
+        public bool TryGetObjectBaseState(Guid id, out ObjectOrientationState state) => _objectStates.TryGetValue(id, out state);   
+
         internal void Reset()
         {
             RestoreObjectsBaseStates();
@@ -90,7 +121,7 @@ namespace Cinnamon.Models
         /// <exception cref="Exception"></exception>
         public static void CreateBaseState()
         {
-            DocumentBaseState.ActiveBase = new DocumentBaseState(RhinoDoc.ActiveDoc.Views.ActiveView.ActiveViewportID);
+            DocumentBaseState.ActiveBase = new DocumentBaseState(RhinoAppMappings.ActiveView.ActiveViewportID);
         }
 
         public static string GetCinnamonSavePathForActiveDoc()
@@ -128,6 +159,16 @@ namespace Cinnamon.Models
                 }
             }
             return false;
+        }
+
+        internal static CameraState GetActiveCameraState()
+        {
+            ActiveBase.ActivateView();
+            return new CameraState(
+                RhinoAppMappings.ActiveViewport.CameraLocation,
+                RhinoAppMappings.ActiveViewport.CameraTarget,
+                RhinoAppMappings.ActiveViewport.Camera35mmLensLength
+                );
         }
 
         void Notify()
@@ -169,7 +210,9 @@ namespace Cinnamon.Models
 
         private DocumentBaseState() { }
 
-        [OnSerialized]
+        [OnDeserialized]
+        void OnDeserializationComplete(System.Runtime.Serialization.StreamingContext ctx) => CompleteInit();
+
         void CompleteInit()
         {
             var view = RhinoDoc.ActiveDoc.Views.Find(ViewportId);
@@ -181,7 +224,9 @@ namespace Cinnamon.Models
             {
                 View = RhinoAppMappings.ActiveView;
             }
-            RhinoAppMappings.ActiveView = View;
+
+            ActivateView();
+
             if (!_hasSubscribedToDocumentSave)
             {
                 RhinoDoc.EndSaveDocument += RhinoDoc_EndSaveDocument;
@@ -195,6 +240,12 @@ namespace Cinnamon.Models
             catch {
                 // Document not saved yet.
             }
+        }
+
+        void ActivateView()
+        {
+            return;
+            //RhinoAppMappings.ActiveView = View;
         }
 
         /// <summary>

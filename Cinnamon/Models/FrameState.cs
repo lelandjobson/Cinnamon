@@ -13,9 +13,9 @@ namespace Cinnamon.Models
 
         #region State Flags
 
-        public bool HasCameraPositionData => CameraState.PositionState != Point3d.Unset;
+        public bool HasCameraPositionData => CameraState.Position != Point3d.Unset;
 
-        public bool HasCameraTargetData => CameraState.TargetPositionState != Point3d.Unset;
+        public bool HasCameraTargetData => CameraState.Target != Point3d.Unset;
 
         public bool HasObjectsAnimating { get; private set; } = false;
 
@@ -33,20 +33,20 @@ namespace Cinnamon.Models
                     l => new LayerState { IsVisible = l.IsVisible, TransparencyState = l.GetTransparency() }
                     ),
 
-                _objectPositionStates = Rhino.RhinoDoc.ActiveDoc.Objects
+                _objectPositionStates = RhinoAppMappings.ActiveDoc.Objects
                     .GetObjectList(Rhino.DocObjects.ObjectType.AnyObject)
                     .ToDictionary(o => o.Id, o => o.TryGetOrientationState(out var state) ? state : new SinglePointObjectOrientationState(o.Id, Point3d.Unset)),
-                CameraState = new CameraState()
-                {
-                    PositionState = RhinoAppMappings.ActiveView.ActiveViewport.CameraLocation,
-                    TargetPositionState = RhinoAppMappings.ActiveView.ActiveViewport.CameraTarget,
-                    FocalLengthState = RhinoAppMappings.ActiveView.ActiveViewport.Camera35mmLensLength,
-                }
+                CameraState = new CameraState(
+                
+                    cameraLocation: RhinoAppMappings.ActiveView.ActiveViewport.CameraLocation,
+                    cameraTarget: RhinoAppMappings.ActiveView.ActiveViewport.CameraTarget,
+                    focalLength: RhinoAppMappings.ActiveView.ActiveViewport.Camera35mmLensLength
+                )
             };
 
         #region State data
 
-        public CameraState CameraState { get; set; } = new CameraState();
+        public CameraState CameraState { get; set; } = DocumentBaseState.GetActiveCameraState();
 
         public List<Action<FrameState>> FrameActions = new List<Action<FrameState>>();
 

@@ -1,5 +1,7 @@
 ﻿using Rhino.Geometry;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Cinnamon.Models
 {
@@ -49,6 +51,21 @@ namespace Cinnamon.Models
                     Plane = Plane.WorldXY;
                     break;
             }
+        }
+
+        public static bool TryCreate(Guid id, IEnumerable<Point3d> points, out ObjectOrientationState state)
+        {
+            var ptsList = points.ToList();
+            if(ptsList.Count == 0) { state = null;  return false; }
+            if(ptsList.Count >= 3)
+            {
+                state = new ThreePointObjectOrientationState(id, ptsList[0], ptsList[1], ptsList[2]);
+            }
+            else
+            {
+                state = new SinglePointObjectOrientationState(id, ptsList[0]);
+            }
+            return true;
         }
 
         public static bool TryCreate(Guid id, out ObjectOrientationState state) => ObjectStateExtensions.TryGetOrientationState(id.ToDocumentObject(), out state); 

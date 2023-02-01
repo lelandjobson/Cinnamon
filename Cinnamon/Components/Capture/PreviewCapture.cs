@@ -85,19 +85,19 @@ namespace Cinnamon.Components.Capture
             if (string.IsNullOrEmpty(objectId))
             {
                 // camera
-                Player.DefaultPlayer.RenderCameraState(CaptureManager_Camera.GetCaptureData(Capture));
+                Player.DefaultPlayer.RenderCameraState(CameraCaptureManager.Default.GetCaptureData(Capture));
                 this.Message = "Rendering Camera";
                 return;
             }
             if(!Guid.TryParse(objectId, out Guid gid)) { return; }
 
-            if (!Document_CaptureManagers.ContainsCapture(gid))
+            if (!DocumentCaptureManagers.ContainsCapture(gid))
             {
                 this.Message = "No Captures found in the document for this object";
                 return;
             }
 
-            if(!Document_CaptureManagers.TryGetOrCreateCaptureManager(gid, out var objState)) { this.Message = "unable to render object"; return; }
+            if(!DocumentCaptureManagers.TryGetOrCreateObjectCaptureManager(gid, out var objState)) { this.Message = "unable to render object"; return; }
             
             this.Message = "Rendering Object";
             Player.DefaultPlayer.RenderObjectState(objState.GetCaptureData(Capture));

@@ -28,9 +28,21 @@ namespace Cinnamon
             }
         }
 
+        internal static Layer[] GetChildrenSafe(this Layer l)
+        {
+            try
+            {
+                return l?.GetChildren() ?? new Layer[0];
+            }
+            catch
+            {
+                return new Layer[0];
+            }
+        }
+
         internal static Point3d ToBBPoint(this ClippingPlaneObject co) => co.Geometry?.GetBoundingBox(true).Center ?? Point3d.Unset;
 
-        internal static RhinoObject ToDocumentObject(this Guid id) => Rhino.RhinoDoc.ActiveDoc.Objects.Find(id);
+        internal static RhinoObject ToDocumentObject(this Guid id) => RhinoAppMappings.ActiveDoc.Objects.Find(id);
 
         internal static Point3d ToBBPoint(this RhinoObject ro) => ro.Geometry?.GetBoundingBox(true).Center ?? Point3d.Unset;
 

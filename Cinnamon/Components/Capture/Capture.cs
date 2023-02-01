@@ -90,22 +90,26 @@ namespace Cinnamon.Components.Capture
             if (string.IsNullOrEmpty(objectId))
             {
                 // Capture the camera
-                CaptureManager_Camera.CreateNewCapture(Capture);
+                CameraCaptureManager.Default.CreateNewCapture(Capture, DocumentBaseState.GetActiveCameraState());
                 this.Message = $"Capture {Capture} Saved";
                 return;
             }
             if (!Guid.TryParse(objectId, out Guid gid)) { return; }
-            var rhobj = Rhino.RhinoDoc.ActiveDoc.Objects.FindId(gid);   
+            var rhobj = RhinoAppMappings.ActiveDoc.Objects.FindId(gid);   
             if(rhobj == null) {
                 this.Message = "Could not find an object with that id.";
                 return;
             }
 
-            if (!Document_CaptureManagers.TryGetOrCreateCaptureManager(gid, out var objManager))
+            if (!DocumentCaptureManagers.TryGetOrCreateObjectCaptureManager(gid, out var objManager))
+            {
+                throw new Exception("Could not create capture manager for object.");
+            }
+            if(!rhobj.TryGetOrientationState(out var state))
             {
                 throw new Exception("Could not animate object.");
             }
-            objManager.CreateNewCapture(Capture,rhobj.GetCriticalPoint());
+            objManager.CreateNewCapture(Capture, state);
             this.Message = $"Capture {Capture} Saved";
 
 

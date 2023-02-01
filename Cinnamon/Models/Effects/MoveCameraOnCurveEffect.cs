@@ -55,11 +55,11 @@ namespace Cinnamon.Models.Effects
         {
             if(CameraCurve != null)
             {
-                state.CameraState.PositionState = GetValue(CameraCurve,percentage);
+                state.CameraState.Position = GetValue(CameraCurve,percentage);
             }
             if(TargetCurve != null)
             {
-                state.CameraState.TargetPositionState = GetValue(TargetCurve,percentage);
+                state.CameraState.Target = GetValue(TargetCurve,percentage);
             }
         }
     }

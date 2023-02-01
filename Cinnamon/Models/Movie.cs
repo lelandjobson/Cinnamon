@@ -11,7 +11,7 @@ namespace Cinnamon.Models
     /// <summary>
     /// A compiled movie with effects
     /// </summary>
-    public class Movie : IEquatable<Movie>
+    public class Movie : ICanUseInPlayer, IEquatable<Movie>
     {
         public readonly Guid Id = Guid.NewGuid();
 

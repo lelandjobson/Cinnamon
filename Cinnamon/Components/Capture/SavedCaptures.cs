@@ -81,7 +81,7 @@ namespace Cinnamon.Components.Capture
             {
                 // Camera
                 this.Message = "Camera";
-                DA.SetDataList(0, CaptureManager_Camera.Captures);
+                DA.SetDataList(0, CameraCaptureManager.Default.CaptureKeys);
                 return;
             }
             if (!Guid.TryParse(objectId, out var objectIdGuid)) { return; }
@@ -89,13 +89,13 @@ namespace Cinnamon.Components.Capture
             //if (!Document_CaptureManagers.ContainsCapture(objectIdGuid)) { this.Message = "Could not find Captures \n for that object."; return; }
             this.Message = "Object";
 
-            if(!Document_CaptureManagers.TryGetOrCreateCaptureManager(objectIdGuid, out var capMap))
+            if(!DocumentCaptureManagers.TryGetOrCreateObjectCaptureManager(objectIdGuid, out var capMap))
             {
                 DA.SetDataList(0, new List<int>());
             }
             else
             {
-                DA.SetDataList(0, capMap.Captures ?? new List<int>());
+                DA.SetDataList(0, capMap.CaptureKeys ?? new List<int>());
             }
         }
 

@@ -2,7 +2,6 @@
 using Cinnamon.Models;
 using Rhino;
 using Rhino.DocObjects;
-using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace Cinnamon
 {
+
 
     [Serializable]
     public class Player
@@ -40,7 +40,7 @@ namespace Cinnamon
         private int _previousFrame = -1;
 
 
-        private static Dictionary<Guid, RhinoObject> _docObjects => __docObjects ?? (__docObjects = Rhino.RhinoDoc.ActiveDoc.Objects.GetObjectList(Rhino.DocObjects.ObjectType.AnyObject).ToDictionary(o => o.Id, o => o));
+        private static Dictionary<Guid, RhinoObject> _docObjects => __docObjects ?? (__docObjects = RhinoAppMappings.ActiveDoc.Objects.GetObjectList(Rhino.DocObjects.ObjectType.AnyObject).ToDictionary(o => o.Id, o => o));
         private static Dictionary<Guid, RhinoObject> __docObjects;
 
         /// <summary>
@@ -92,24 +92,7 @@ namespace Cinnamon
 
         public void RenderCameraState(CameraState state)
         {
-            //RhinoAppMappings.ActiveViewport.SetCameraLocation(state.PositionState, false);
-            //RhinoAppMappings.ActiveViewport.SetCameraTarget(state.TargetPositionState, false);
-            if (!double.IsNaN(state.FocalLengthState))
-            {
-                DocumentBaseState.ActiveBase.Viewport.Camera35mmLensLength = state.FocalLengthState;
-            }
-            if(state.PositionState != Point3d.Unset && state.TargetPositionState != Point3d.Unset)
-            {
-                DocumentBaseState.ActiveBase.Viewport.SetCameraLocations(state.TargetPositionState, state.PositionState);
-            }
-            else if(state.PositionState == Point3d.Unset && state.TargetPositionState != Point3d.Unset)
-            {
-                DocumentBaseState.ActiveBase.Viewport.SetCameraTarget(state.TargetPositionState, false);
-            }
-            else if(state.PositionState != Point3d.Unset && state.TargetPositionState == Point3d.Unset)
-            {
-                DocumentBaseState.ActiveBase.Viewport.SetCameraLocation(state.PositionState, false);
-            }
+            state.Apply();
         }
 
         public void RenderObjectState(ObjectOrientationState state)
@@ -134,9 +117,6 @@ namespace Cinnamon
         /// <param name="prevState">Previous state is required for tween animations</param>
         public void RenderState(FrameState curState, FrameState prevState)
         {
-            // Ensure correct viewport is rendering
-            RhinoAppMappings.ActiveView = DocumentBaseState.ActiveBase.View;
-
             // Camera
             RenderCameraState(curState.CameraState);
 
