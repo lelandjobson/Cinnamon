@@ -46,7 +46,7 @@ namespace Cinnamon.Models
 
         #region State data
 
-        public CameraState CameraState { get; set; } = DocumentBaseState.GetActiveCameraState();
+        public CameraState CameraState { get; set; } 
 
         public List<Action<FrameState>> FrameActions = new List<Action<FrameState>>();
 

@@ -109,7 +109,7 @@ namespace Cinnamon
         public void RenderState(FrameState curState, FrameState prevState)
         {
             // Camera
-            RenderCameraState(curState.CameraState);
+            if (curState.CameraState != null) { RenderCameraState(curState.CameraState); }
 
             if (curState.HasLayerStates)
             {

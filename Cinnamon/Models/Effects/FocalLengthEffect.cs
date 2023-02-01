@@ -37,6 +37,7 @@ namespace Cinnamon.Models.Effects
 
         public void SetFrameStateValue(double percentage, FrameState state)
         {
+            if(state.CameraState == null) { state.CameraState = DocumentBaseState.GetActiveCameraState(); }
             if(FocalLengthStates.Count == 2)
             {
                 state.CameraState.FocalLength = percentage.PercToValue(FocalLengthStates[0], FocalLengthStates[1]);
