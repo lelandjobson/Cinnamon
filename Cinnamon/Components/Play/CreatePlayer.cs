@@ -158,7 +158,7 @@ namespace Cinnamon.Components.Create
         void SeekFrame(int frame, Movie m)
         {
             _mainPlayer.Movie = m;
-            _mainPlayer.ScanFrame(frame);
+            _mainPlayer.ScanFrame(frame, false);
             this.Message = $"Showing \n {frame + 1}/{m.FrameCount}";
         }
 

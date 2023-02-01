@@ -1,4 +1,5 @@
-﻿using Rhino;
+﻿using Cinnamon.Components.Capture.Managers;
+using Rhino;
 using Rhino.Geometry;
 using System;
 
@@ -16,7 +17,21 @@ namespace Cinnamon.Models
             // Single point orientation
             var rhObj = Id.ToDocumentObject();
             var vec = PositionState - rhObj.ToBBPoint();
-            RhinoAppMappings.ActiveDoc.Objects.Transform(rhObj.Id, Transform.Translation(vec), true);
+            Transform xform = Transform.Translation(vec);
+            RhinoAppMappings.ActiveDoc.Objects.Transform(rhObj.Id, xform, true);
+
+            // Check for tethers
+            if (TetherManager.Tethers.ContainsKey(Id))
+            {
+                foreach (var follower in TetherManager.Tethers[Id])
+                {
+                    try
+                    {
+                        RhinoAppMappings.ActiveDoc.Objects.Transform(follower, xform, true);
+                    }
+                    catch { }
+                }
+            }
         }
     }
 }
