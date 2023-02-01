@@ -35,7 +35,7 @@ namespace Cinnamon.Components.Capture
             var cameraTarKey = payload.Points.Keys.First(k => k.Contains(POINTNAME_CAMERATARGET));
             if (cameraTarKey != null)
             {
-                camOrigin = payload.Points[cameraLocKey];
+                camTarget = payload.Points[cameraTarKey];
             }
 
             return new CameraState(camOrigin, camTarget, camFocalLength);   
@@ -56,7 +56,7 @@ namespace Cinnamon.Components.Capture
             LayerStorageManager.Store(new LayerStoragePayload(layer, new System.Collections.Generic.Dictionary<string, Rhino.Geometry.Point3d>()
             {
                 { $"{POINTNAME_CAMERALOCATION}_{data.FocalLength}", data.Position},
-                { $"{POINTNAME_CAMERATARGET}_{data.FocalLength}", data.Target},
+                { $"{POINTNAME_CAMERATARGET}", data.Target},
             }));
 
         }

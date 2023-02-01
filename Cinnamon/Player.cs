@@ -92,21 +92,12 @@ namespace Cinnamon
 
         public void RenderCameraState(CameraState state)
         {
-            state.Apply();
+            state?.Apply();
         }
 
         public void RenderObjectState(ObjectOrientationState state)
         {
             state?.Apply();
-
-            //if(state.Kind == OrientationStateKind.ThreePoint)
-            //{
-
-            //}
-            //else
-            //{
- 
-            //}
         }
 
         /// <summary>
