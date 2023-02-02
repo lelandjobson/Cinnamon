@@ -77,7 +77,7 @@ namespace Cinnamon.Components.Capture
             Regen();
         }
 
-        protected bool ClearCaptureData(int order, out Layer layer)
+        public bool ClearCaptureData(int order, out Layer layer)
         {
             if (!_captures.ContainsKey(order)) { layer = null; return false; }
             Layer l = _captures[order].Layer;

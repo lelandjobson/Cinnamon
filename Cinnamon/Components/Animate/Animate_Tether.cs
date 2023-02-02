@@ -76,7 +76,7 @@ namespace Cinnamon.Components.Create
             DA.GetData(2, ref breakTether);
             if (breakTether)
             {
-                if (TetherManager.Tethers.ContainsKey(leaderId)) { return; }
+                if (!TetherManager.Tethers.ContainsKey(leaderId)) { return; }
                 if(followerIds.Count == 0)
                 {
                     TetherManager.Tethers.Remove(leaderId);
